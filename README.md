@@ -1,4 +1,4 @@
-# Wealth Training Material Generator
+# Content Studio
 ## With Locked Brand Design System
 
 A professional training material generator that maintains immutable brand consistency while allowing content flexibility.
