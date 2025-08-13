@@ -21,39 +21,99 @@ function generateSVGChart(type, data, width = 800, height = 400) {
 function generateBarChart(data, width, height, padding) {
   const chartWidth = width - padding * 2;
   const chartHeight = height - padding * 2;
-  const barWidth = chartWidth / data.labels.length * 0.8;
-  const gap = chartWidth / data.labels.length * 0.2;
+  const barWidth = chartWidth / data.labels.length * 0.7;
+  const gap = chartWidth / data.labels.length * 0.3;
   const maxValue = Math.max(...data.values);
   
   let svg = `<svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
-    <rect width="${width}" height="${height}" fill="#000000"/>
+    <!-- Background with subtle gradient -->
+    <defs>
+      <linearGradient id="bgGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+        <stop offset="0%" style="stop-color:#0a0a0a;stop-opacity:1" />
+        <stop offset="100%" style="stop-color:#000000;stop-opacity:1" />
+      </linearGradient>
+      <filter id="glow">
+        <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
+        <feMerge>
+          <feMergeNode in="coloredBlur"/>
+          <feMergeNode in="SourceGraphic"/>
+        </feMerge>
+      </filter>
+      <filter id="shadow">
+        <feGaussianBlur in="SourceAlpha" stdDeviation="3"/>
+        <feOffset dx="2" dy="2" result="offsetblur"/>
+        <feFlood flood-color="#000000" flood-opacity="0.5"/>
+        <feComposite in2="offsetblur" operator="in"/>
+        <feMerge>
+          <feMergeNode/>
+          <feMergeNode in="SourceGraphic"/>
+        </feMerge>
+      </filter>
+    </defs>
+    <rect width="${width}" height="${height}" fill="url(#bgGradient)"/>
+    
+    <!-- Grid lines for better readability -->
     <g transform="translate(${padding}, ${padding})">`;
   
-  // Draw bars
+  // Add horizontal grid lines
+  for (let i = 0; i <= 5; i++) {
+    const y = (chartHeight / 5) * i;
+    svg += `<line x1="0" y1="${y}" x2="${chartWidth}" y2="${y}" 
+      stroke="${brandConfig.colors.textSecondary}" stroke-width="0.5" opacity="0.2"/>`;
+    const value = Math.round(maxValue * (1 - i/5));
+    svg += `<text x="-10" y="${y + 4}" text-anchor="end" 
+      fill="${brandConfig.colors.textSecondary}" font-size="10" opacity="0.6">
+      ${value.toLocaleString()}</text>`;
+  }
+  
+  // Draw bars with enhanced styling
   data.labels.forEach((label, i) => {
     const barHeight = (data.values[i] / maxValue) * chartHeight;
-    const x = i * (barWidth + gap);
+    const x = i * (chartWidth / data.labels.length) + gap/2;
     const y = chartHeight - barHeight;
     
-    // Bar with gradient
+    // Enhanced gradient for each bar
     svg += `<defs>
-      <linearGradient id="goldGradient${i}" x1="0%" y1="0%" x2="0%" y2="100%">
+      <linearGradient id="barGradient${i}" x1="0%" y1="0%" x2="0%" y2="100%">
         <stop offset="0%" style="stop-color:${brandConfig.colors.goldLight};stop-opacity:1" />
-        <stop offset="100%" style="stop-color:${brandConfig.colors.gold};stop-opacity:1" />
+        <stop offset="50%" style="stop-color:${brandConfig.colors.gold};stop-opacity:1" />
+        <stop offset="100%" style="stop-color:${brandConfig.colors.gold};stop-opacity:0.8" />
       </linearGradient>
     </defs>`;
     
+    // Bar with rounded corners and shadow
     svg += `<rect x="${x}" y="${y}" width="${barWidth}" height="${barHeight}" 
-      fill="url(#goldGradient${i})" stroke="${brandConfig.colors.gold}" stroke-width="2"/>`;
+      rx="4" ry="4"
+      fill="url(#barGradient${i})" 
+      filter="filter(shadow)"
+      stroke="${brandConfig.colors.goldLight}" 
+      stroke-width="1" 
+      opacity="0.95"/>`;
     
-    // Value label
-    svg += `<text x="${x + barWidth/2}" y="${y - 5}" 
-      text-anchor="middle" fill="${brandConfig.colors.cyan}" font-size="14" font-weight="bold">
-      ${data.values[i]}</text>`;
+    // Animated hover effect placeholder
+    svg += `<rect x="${x}" y="${y}" width="${barWidth}" height="${barHeight}" 
+      rx="4" ry="4"
+      fill="transparent" 
+      stroke="${brandConfig.colors.cyan}" 
+      stroke-width="2" 
+      opacity="0"
+      class="bar-hover">
+      <animate attributeName="opacity" begin="mouseover" dur="0.2s" to="0.5" fill="freeze"/>
+      <animate attributeName="opacity" begin="mouseout" dur="0.2s" to="0" fill="freeze"/>
+    </rect>`;
     
-    // X-axis label
-    svg += `<text x="${x + barWidth/2}" y="${chartHeight + 20}" 
-      text-anchor="middle" fill="${brandConfig.colors.textPrimary}" font-size="12">
+    // Value label with background
+    const labelY = y - 15;
+    svg += `<rect x="${x + barWidth/2 - 35}" y="${labelY - 12}" width="70" height="20" 
+      rx="10" ry="10" fill="${brandConfig.colors.cyan}" opacity="0.9"/>`;
+    svg += `<text x="${x + barWidth/2}" y="${labelY}" 
+      text-anchor="middle" fill="#000" font-size="12" font-weight="bold">
+      $${(data.values[i]/1000).toFixed(0)}K</text>`;
+    
+    // X-axis label with better styling
+    svg += `<text x="${x + barWidth/2}" y="${chartHeight + 25}" 
+      text-anchor="middle" fill="${brandConfig.colors.textPrimary}" 
+      font-size="13" font-weight="500" font-family="Inter, sans-serif">
       ${label}</text>`;
   });
   
