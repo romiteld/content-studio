@@ -144,8 +144,8 @@ router.post('/pdf', async (req, res) => {
     const outputPath = path.join(outputDir, filename);
     
     const browser = await puppeteer.launch({
-      headless: 'new',
-      args: ['--no-sandbox', '--disable-setuid-sandbox']
+      headless: true,
+      args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage']
     });
     
     const page = await browser.newPage();
@@ -179,7 +179,8 @@ router.post('/pdf', async (req, res) => {
     );
   } catch (error) {
     console.error('PDF generation error:', error);
-    res.status(500).json({ error: 'Failed to generate PDF' });
+    console.error('Error stack:', error.stack);
+    res.status(500).json({ error: 'Failed to generate PDF', details: error.message });
   }
 });
 
