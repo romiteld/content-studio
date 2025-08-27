@@ -26,8 +26,12 @@ module.exports = async (req, res) => {
       return res.status(400).json({ error: 'Prompt is required' });
     }
 
-    // Initialize Google GenAI client
-    const genAI = new GoogleGenAI(process.env.GOOGLE_GENERATIVE_AI_API_KEY);
+    // Initialize Google GenAI client with API key
+    const apiKey = process.env.GOOGLE_GENERATIVE_AI_API_KEY || process.env.GOOGLE_AI_API_KEY;
+    if (!apiKey) {
+      throw new Error('Google AI API key not found');
+    }
+    const genAI = new GoogleGenAI(apiKey);
 
     // Build enhanced prompt with brand context
     let enhancedPrompt = prompt;
