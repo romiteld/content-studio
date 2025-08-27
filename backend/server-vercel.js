@@ -5,7 +5,7 @@ const multer = require('multer');
 const brandConfig = require('./config/brandLock');
 const fs = require('fs');
 
-// Load .env.local if it exists
+// Load environment variables
 if (fs.existsSync(path.join(__dirname, '.env.local'))) {
   require('dotenv').config({ path: path.join(__dirname, '.env.local') });
 } else {
@@ -13,17 +13,13 @@ if (fs.existsSync(path.join(__dirname, '.env.local'))) {
 }
 
 const app = express();
-const PORT = process.env.PORT || 3001;
 
 app.use(cors());
 app.use(express.json());
-app.use(express.static(path.join(__dirname, '../frontend/build')));
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-app.use('/brand-assets', express.static(path.join(__dirname, '../brand-assets/protected')));
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, 'uploads/');
+    cb(null, '/tmp/');
   },
   filename: (req, file, cb) => {
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
@@ -51,7 +47,7 @@ app.get('/api/brand-config', (req, res) => {
 });
 
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'OK', brand: 'locked' });
+  res.json({ status: 'OK', brand: 'locked', vercel: true });
 });
 
 // Routes
@@ -66,22 +62,16 @@ app.use('/api/ai/image', require('./routes/ai-image'));
 app.use('/api/vision', require('./routes/vision'));
 app.use('/api/brand', require('./routes/brand'));
 
-// AI Agents Endpoints
-const aiAgents = require('./api/ai-agents');
-app.post('/api/agents/generate', aiAgents.generateContent);
-app.post('/api/agents/weekly', aiAgents.generateWeeklyContent);
-app.post('/api/agents/visual', aiAgents.generateVisual);
-app.post('/api/agents/validate', aiAgents.validateCompliance);
+// AI Agents Endpoints (These are now handled by Vercel Functions)
+// app.use('/api/agents', require('./api/ai-agents'));
 
 // Partners API
 app.use('/api/partners', require('./api/partners'));
 
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../frontend/build', 'index.html'));
+// Error handling
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ error: 'Something went wrong!', details: err.message });
 });
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-  console.log('Brand configuration: LOCKED');
-  console.log('Style modifications: DISABLED');
-});
+module.exports = app;

@@ -11,6 +11,10 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
-    "puppeteer": "^24.15.0"
+    "@ai-sdk/google": "^2.0.11",
+    "@ai-sdk/openai": "^2.0.22",
+    "ai": "^5.0.26",
+    "puppeteer": "^24.15.0",
+    "zod": "^4.1.3"
   }
 }

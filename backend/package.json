@@ -12,6 +12,7 @@
     "@google/generative-ai": "^0.24.1",
     "@langchain/core": "^0.3.72",
     "@langchain/langgraph": "^0.4.6",
+    "@supabase/supabase-js": "^2.56.0",
     "ai": "^5.0.25",
     "axios": "^1.11.0",
     "better-sqlite3": "^12.2.0",

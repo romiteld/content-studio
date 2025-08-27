@@ -161,11 +161,20 @@ class UnifiedMarketingAgent {
   }
 
   // Edit existing images with text prompts
-  async editImage(imagePath, editPrompt) {
+  async editImage(imagePathOrData, editPrompt, isBase64 = false) {
     try {
-      // Read the existing image
-      const imageData = await fs.readFile(imagePath);
-      const base64Image = imageData.toString('base64');
+      let base64Image;
+      
+      if (isBase64) {
+        // If imagePathOrData is already base64 data
+        base64Image = imagePathOrData.replace(/^data:image\/\w+;base64,/, '');
+      } else if (imagePathOrData) {
+        // If it's a file path, read the file
+        const imageData = await fs.readFile(imagePathOrData);
+        base64Image = imageData.toString('base64');
+      } else {
+        throw new Error('No image path or data provided');
+      }
 
       const prompt = [
         { text: editPrompt },
@@ -663,11 +672,20 @@ module.exports = {
 
   // Edit existing image
   async editImage(req, res) {
-    const { imagePath, editPrompt } = req.body;
+    const { imagePath, imageData, editPrompt } = req.body;
     const agent = new UnifiedMarketingAgent();
     
     try {
-      const editedImage = await agent.editImage(imagePath, editPrompt);
+      let editedImage;
+      if (imageData) {
+        // If base64 image data is provided
+        editedImage = await agent.editImage(imageData, editPrompt, true);
+      } else if (imagePath) {
+        // If file path is provided
+        editedImage = await agent.editImage(imagePath, editPrompt, false);
+      } else {
+        return res.status(400).json({ error: 'Either imagePath or imageData is required' });
+      }
       res.json({ success: true, image: editedImage });
     } catch (error) {
       console.error('Image editing error:', error);
