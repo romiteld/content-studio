@@ -13,6 +13,120 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY
 );
 
+const generateHTMLFromContent = async (content, title) => {
+  // Generate HTML directly from content string
+  const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${title || 'The Well Recruiting Solutions - Training Material'}</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@400;600&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: ${brandConfig.fonts.body};
+            line-height: 1.6;
+            background: #000;
+            color: #fff;
+        }
+        
+        .page {
+            width: 210mm;
+            min-height: 297mm;
+            margin: 0 auto;
+            background: white;
+            color: #000;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            position: relative;
+            page-break-after: always;
+        }
+        
+        @media print {
+            .page {
+                margin: 0;
+                box-shadow: none;
+            }
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #000 0%, #1a1a1a 100%);
+            color: ${brandConfig.colors.gold};
+            padding: 40px;
+            text-align: center;
+            border-bottom: 4px solid ${brandConfig.colors.gold};
+        }
+        
+        .logo {
+            font-family: ${brandConfig.fonts.display};
+            font-size: 36px;
+            margin-bottom: 10px;
+            letter-spacing: 2px;
+        }
+        
+        .tagline {
+            font-size: 14px;
+            color: ${brandConfig.colors.cyan};
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .content-section {
+            padding: 40px;
+        }
+        
+        h1, h2, h3 {
+            font-family: ${brandConfig.fonts.display};
+            color: #000;
+            margin-bottom: 20px;
+        }
+        
+        p {
+            margin-bottom: 15px;
+            text-align: justify;
+        }
+        
+        .footer {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: #000;
+            color: ${brandConfig.colors.gold};
+            padding: 20px;
+            text-align: center;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="page">
+        <div class="header">
+            <div class="logo">THE WELL</div>
+            <div class="tagline">RECRUITING SOLUTIONS</div>
+        </div>
+        
+        <div class="content-section">
+            <h1>${title}</h1>
+            ${content}
+        </div>
+        
+        <div class="footer">
+            <p>© ${new Date().getFullYear()} The Well Recruiting Solutions | Generated ${new Date().toLocaleDateString()}</p>
+        </div>
+    </div>
+</body>
+</html>`;
+  
+  return html;
+};
+
 const generateHTML = async (contentIds) => {
   try {
     // Fetch content from Supabase
@@ -219,13 +333,20 @@ const generateHTML = async (contentIds) => {
 // Generate PDF
 router.post('/pdf', async (req, res) => {
   try {
-    const { contentIds, title = 'Training Material' } = req.body;
+    const { contentIds, content, title = 'Training Material' } = req.body;
     
-    if (!contentIds || !Array.isArray(contentIds) || contentIds.length === 0) {
-      return res.status(400).json({ error: 'No content selected' });
+    let html;
+    
+    // Support both content IDs and direct content
+    if (content && typeof content === 'string') {
+      // Direct content mode - generate HTML from provided content
+      html = await generateHTMLFromContent(content, title);
+    } else if (contentIds && Array.isArray(contentIds) && contentIds.length > 0) {
+      // ID-based mode - fetch content from database
+      html = await generateHTML(contentIds);
+    } else {
+      return res.status(400).json({ error: 'No content provided. Send either content or contentIds' });
     }
-
-    const html = await generateHTML(contentIds);
     
     // For serverless environments, return HTML for client-side PDF generation
     const htmlBuffer = Buffer.from(html, 'utf8');

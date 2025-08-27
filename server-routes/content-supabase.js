@@ -13,6 +13,22 @@ router.get('/', async (req, res) => {
   }
 });
 
+// Search content - MUST be before /:id route
+router.get('/search', async (req, res) => {
+  try {
+    const { q } = req.query;
+    if (!q) {
+      return res.status(400).json({ error: 'Search query required' });
+    }
+    
+    const results = await db.searchContent(q);
+    res.json(results);
+  } catch (error) {
+    console.error('Error searching content:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // Get content by ID
 router.get('/:id', async (req, res) => {
   try {
@@ -30,16 +46,25 @@ router.get('/:id', async (req, res) => {
 // Create new content
 router.post('/', async (req, res) => {
   try {
-    // Ensure content_data is properly formatted
-    const contentData = typeof req.body.content_data === 'string' 
-      ? JSON.parse(req.body.content_data) 
-      : req.body.content_data;
+    // Ensure content_data is properly formatted with defaults
+    let contentData;
+    if (req.body.content_data) {
+      contentData = typeof req.body.content_data === 'string' 
+        ? JSON.parse(req.body.content_data) 
+        : req.body.content_data;
+    } else if (req.body.content) {
+      // Support legacy content field
+      contentData = { text: req.body.content };
+    } else {
+      // Default empty content
+      contentData = { text: '' };
+    }
 
     const newContent = {
-      section_type: req.body.section_type,
-      title: req.body.title,
+      section_type: req.body.section_type || req.body.type || 'content', // Support different field names with default
+      title: req.body.title || 'Untitled',
       content_data: contentData,
-      chart_data: req.body.chart_data,
+      chart_data: req.body.chart_data || null,
       display_order: req.body.display_order || 999
     };
 

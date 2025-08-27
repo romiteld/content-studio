@@ -84,6 +84,17 @@ const db = {
     return { success: true };
   },
 
+  async searchContent(query) {
+    const { data, error } = await supabase
+      .from('content')
+      .select('*')
+      .or(`title.ilike.%${query}%,content_data->text.ilike.%${query}%`)
+      .order('display_order', { ascending: true });
+    
+    if (error) throw error;
+    return data;
+  },
+
   // Templates operations
   async getAllTemplates() {
     const { data, error } = await supabase
@@ -101,6 +112,17 @@ const db = {
       .from('partners')
       .select('*')
       .order('id', { ascending: true });
+    
+    if (error) throw error;
+    return data;
+  },
+
+  async getActivePartners() {
+    const { data, error } = await supabase
+      .from('partners')
+      .select('*')
+      .or('status.eq.active,status.is.null')  // Include null status as active by default
+      .order('company_name', { ascending: true });
     
     if (error) throw error;
     return data;

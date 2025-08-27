@@ -392,16 +392,49 @@ module.exports = {
   
   // Validate content compliance
   async validateCompliance(req, res) {
-    const { content } = req.body;
+    const { content, type = 'marketing' } = req.body;
+    
+    if (!content) {
+      return res.status(400).json({ error: 'Content is required for validation' });
+    }
     
     try {
       const validation = await contentWorkflow.agents.complianceValidator.execute(
-        `Validate for compliance: ${content}`
+        `Validate the following ${type} content for compliance. Return results in JSON format with status, score, issues, corrections, improvements, and summary fields:\n\n${content}`
       );
-      res.json({ success: true, validation });
+      
+      // Ensure response is properly formatted
+      let formattedValidation;
+      if (typeof validation === 'string') {
+        // Try to extract JSON from string response
+        try {
+          const jsonMatch = validation.match(/\{[\s\S]*\}/);
+          formattedValidation = jsonMatch ? JSON.parse(jsonMatch[0]) : {
+            status: 'Review Required',
+            score: 5,
+            issues: [],
+            corrections: [],
+            improvements: [],
+            summary: validation
+          };
+        } catch {
+          formattedValidation = {
+            status: 'Review Required',
+            score: 5,
+            issues: [],
+            corrections: [],
+            improvements: [],
+            summary: validation
+          };
+        }
+      } else {
+        formattedValidation = validation;
+      }
+      
+      res.json({ success: true, validation: formattedValidation });
     } catch (error) {
       console.error('Compliance validation error:', error);
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: `Compliance validation failed: ${error.message}` });
     }
   }
 };

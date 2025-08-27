@@ -15,6 +15,20 @@ router.get('/', async (req, res) => {
   }
 });
 
+// Get active partners
+router.get('/active', async (req, res) => {
+  try {
+    const activePartners = await db.query('partners', {
+      where: { status: 'active' },
+      orderBy: 'company_name'
+    });
+    res.json(activePartners);
+  } catch (error) {
+    console.error('Error fetching active partners:', error);
+    res.status(500).json({ error: 'Failed to fetch active partners' });
+  }
+});
+
 // Get partner firms
 router.get('/firms', async (req, res) => {
   try {
