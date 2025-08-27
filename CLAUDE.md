@@ -4,9 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a wealth management training material generator with two main components:
-1. **Full-stack web application** - React frontend + Express backend for dynamic content management
-2. **Static HTML reports** - Standalone wealth management role guides with PDF generation
+Wealth Management Content Studio - An AI-powered training material generator with enterprise brand lock system. Full-stack application with React frontend, Express backend, SQLite database, and integrations with Google Gemini AI and Firecrawl for research.
 
 ## Commands
 
@@ -17,19 +15,20 @@ This is a wealth management training material generator with two main components
 # Terminal 1 - Backend (port 3001)
 cd backend && npm start
 
-# Terminal 2 - Frontend (port 3000)
-cd frontend && npm start
+# Terminal 2 - Frontend (port 3000)  
+cd backend/frontend && npm start
 ```
 
 **Initialize/Reset Database:**
 ```bash
 cd backend
 node database/init.js
+node database/import-partners.js  # Import partner firm data
 ```
 
 **Build Production Frontend:**
 ```bash
-cd frontend && npm run build
+cd backend/frontend && npm run build
 ```
 
 **Generate PDF from Static Report:**
@@ -39,100 +38,114 @@ node generate-pdf.js  # Creates PDF from wealth-roles-2025-spaced.html
 
 ## Architecture
 
-### Full-Stack Application Structure
+### Directory Structure
 
-**Backend (`/backend`)**
-- Express server on port 3001
-- SQLite database (`wealth_training.db`)
-- Key routes:
-  - `/api/content` - CRUD operations for training content
-  - `/api/upload` - File processing (Word, PDF, Markdown, CSV)
-  - `/api/generate` - PDF/PowerPoint generation
-  - `/api/research` - Content research and trending topics
-  - `/api/social` - Social media optimization
-  - `/api/templates` - Locked brand templates
+- `/backend` - Express server (port 3001)
+  - `/api` - AI integrations (Gemini marketing, vision, agents)
+  - `/database` - SQLite database and schema
+  - `/routes` - API endpoints
+  - `/generated` - Output PDFs and PowerPoints
+  - `/uploads` - Temporary file storage
 
-**Frontend (`/frontend`)**
-- React 19 with TypeScript
-- Components organized by function:
-  - Core panels: `ContentEditor`, `UploadManager`, `GeneratePanel`, `ResearchPanel`, `SocialMediaOptimizer`
-  - Locked brand components in `/components/locked/`
-- Brand styles in `/styles/brand.locked.css` (immutable)
+- `/backend/frontend` - React application (port 3000)
+  - `/src/components` - React components
+  - `/src/components/locked` - Protected brand components
+  - `/src/config` - API and brand configuration
+  - `/src/styles` - CSS including locked brand styles
 
-### Brand Lock System
+### Key API Routes
 
-**Immutable Design Elements:**
-- Colors: Black primary, Gold (#BE9E44/#D4AF37), Cyan (#2EA3F2/#4FC3F7)
-- Fonts: Inter family only
-- Layout patterns defined in `brandLock.js`
-- All style overrides are blocked and logged to `brand_protection_log` table
+**Content Management:**
+- `/api/content` - CRUD operations for training content
+- `/api/upload` - File processing (Word, PDF, Markdown, CSV)
+- `/api/generate` - PDF/PowerPoint generation
+- `/api/templates` - Locked brand templates
 
-**Configuration:**
-- Backend: `/backend/config/brandLock.js`
-- Frontend: `/frontend/src/config/brandConfig.ts`
-- Styles: `/frontend/src/styles/brand.locked.css`
+**AI & Marketing:**
+- `/api/ai/generate-campaign` - Generate marketing campaigns
+- `/api/ai/generate-image` - Image generation with Gemini
+- `/api/vision/analyze` - Image analysis
+- `/api/ai-agents/*` - Various AI agent endpoints
+
+**Research & Social:**
+- `/api/research` - Firecrawl integration for web research
+- `/api/social` - Social media optimization
+- `/api/partners` - Partner firm management
 
 ### Database Schema
 
-**Core Tables:**
+Core tables in `wealth_training.db`:
 - `content` - Training material sections with JSON content_data
-- `templates` - Locked presentation templates
-- `upload_history` - Processed file tracking
-- `brand_protection_log` - Style override attempts
-- `social_connections` - Platform integrations
+- `templates` - Locked presentation templates (immutable)
+- `uploads` - Processed file tracking  
 - `generated_documents` - Output file tracking
+- `partners` - Partner firm information
+- `campaigns`, `campaign_content` - Marketing campaign data
+- `brand_protection_log` - Style override attempts
 
-### Key Integration Points
+### Brand Lock System
 
-**Research Feature:**
-- Uses Firecrawl API when `FIRECRAWL_API_KEY` is set in `.env.local`
-- Falls back to mock data if API unavailable
-- Converts research to content via `/api/research/convert`
+**Protected Files (DO NOT MODIFY):**
+- `/backend/frontend/src/components/locked/*` - Immutable brand components
+- `/backend/frontend/src/styles/brand.locked.css` - Protected styles
+- `/backend/config/brandLock.js` - Brand enforcement rules
 
-**Document Generation:**
-- PDF: Uses Puppeteer with brand-locked templates
-- PowerPoint: Uses PptxGenJS with enforced brand colors
-- All generated files stored in `/backend/generated/`
+**Brand Colors:**
+- Black primary
+- Gold: #BE9E44 / #D4AF37
+- Cyan: #2EA3F2 / #4FC3F7
 
-**Upload Processing:**
-- Supported formats: .docx, .pdf, .txt, .md, .csv
+All style overrides are blocked and logged to `brand_protection_log` table.
+
+### Environment Configuration
+
+Create `.env.local` files:
+
+**Backend (`/backend/.env.local`):**
+```env
+PORT=3001
+GEMINI_API_KEY=your_gemini_api_key
+FIRECRAWL_API_KEY=your_firecrawl_api_key
+```
+
+**Frontend (`/backend/frontend/.env.local`):**
+```env
+REACT_APP_API_URL=http://localhost:3001
+```
+
+## Key Integration Points
+
+### AI Features
+- **Gemini 2.5 Flash** - Content generation, image creation
+- **Firecrawl API** - Web scraping when API key is set
+- Falls back to mock data if APIs unavailable
+
+### Document Generation
+- **PDF**: Uses Puppeteer with brand templates
+- **PowerPoint**: Uses PptxGenJS with enforced colors
+- Generated files stored in `/backend/generated/`
+
+### Upload Processing
+- Supports: .docx, .pdf, .txt, .md, .csv
 - Strips all styling, applies brand templates
 - Uses Mammoth for Word, pdf-parse for PDF
 
-### Static Reports
-
-**Files:**
-- `wealth-roles-2025.html` - Main report (view directly in browser)
-- `wealth-roles-2025-spaced.html` - Print-optimized for PDF
-- `generate-pdf.js` - Puppeteer script for PDF generation
-
-**Structure:**
-- 10-page report with embedded CSS
-- No external dependencies or CDN usage
-- Print-specific CSS with `@page` rules
-- CSS custom properties for theming
-
 ## Development Guidelines
 
-### When Adding Features
+### Adding Features
 1. Content changes go through database - never modify templates directly
-2. All new components must import and use `brandConfig`
+2. All components must use `brandConfig` for styling
 3. Style attributes in user content are automatically sanitized
-4. Research content must be cleaned before display (use `cleanContent` function)
-
-### Environment Variables
-Always use `.env.local` files (frontend/backend roots):
-- `FIRECRAWL_API_KEY` - For research API
-- `PORT` - Override default ports if needed
+4. Research content must be cleaned before display (use `cleanContent`)
 
 ### Testing Workflows
-1. Upload functionality: Test with sample Word/PDF files
-2. Brand lock: Attempt style changes and check `brand_protection_log`
-3. Generation: Verify PDFs maintain exact styling
-4. Research: Test with/without Firecrawl API key
+1. **Upload**: Test with sample Word/PDF files
+2. **Brand Lock**: Attempt style changes, check `brand_protection_log`
+3. **Generation**: Verify PDFs maintain exact styling
+4. **Research**: Test with/without Firecrawl API key
 
 ### Common Issues
-- Port conflicts: Backend uses 3001, Frontend uses 3000
-- Database locked: Stop server, delete `.db` file, run `init.js`
-- Style override attempts: Check console and database logs
-- CORS errors: Ensure backend is running before frontend
+- **Port conflicts**: Backend uses 3001, Frontend uses 3000
+- **Database locked**: Stop server, delete `.db` file, run `init.js`
+- **CORS errors**: Ensure backend is running before frontend
+- **Style overrides**: Check console and database logs

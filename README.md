@@ -86,9 +86,9 @@ cd wealth-content-studio
 ```
 
 2. **Setup Environment Variables**
-Create `.env.local` files in both frontend and backend directories:
+Create `.env.local` files:
 
-Backend `.env.local`:
+Backend `.env.local` (`/backend/.env.local`):
 ```env
 PORT=3001
 GEMINI_API_KEY=your_gemini_api_key
@@ -96,7 +96,7 @@ FIRECRAWL_API_KEY=your_firecrawl_api_key
 NODE_ENV=development
 ```
 
-Frontend `.env.local`:
+Frontend `.env.local` (`/backend/frontend/.env.local`):
 ```env
 REACT_APP_API_URL=http://localhost:3001
 ```
@@ -107,7 +107,7 @@ REACT_APP_API_URL=http://localhost:3001
 cd backend && npm install
 
 # Install frontend dependencies
-cd ../frontend && npm install
+cd frontend && npm install
 ```
 
 4. **Initialize Database**
@@ -128,7 +128,7 @@ npm start
 
 Terminal 2 - Frontend:
 ```bash
-cd frontend
+cd backend/frontend
 npm start
 # App opens at http://localhost:3000
 ```
@@ -249,14 +249,17 @@ All charts automatically apply brand colors with professional styling:
 wealth-content-studio/
 ├── 🔧 backend/
 │   ├── api/                      # AI API integrations
+│   │   ├── agents/              # AI agent modules
 │   │   ├── gemini-marketing-ai.js
-│   │   └── vision-ai.js
+│   │   ├── gemini-vision.js
+│   │   ├── omnichannel-marketing-ai.js
+│   │   └── partners.js
 │   ├── config/
-│   │   ├── api.js               # API configuration
 │   │   └── brandLock.js         # Brand protection rules
 │   ├── database/
 │   │   ├── schema.sql           # Core database schema
 │   │   ├── thewell-schema-extensions.sql
+│   │   ├── supabase-schema.sql  # Supabase integration
 │   │   ├── wealth_training.db   # SQLite database
 │   │   └── import-partners.js   # Partner data import
 │   ├── routes/
@@ -265,51 +268,72 @@ wealth-content-studio/
 │   │   ├── generate.js          # PDF/PowerPoint generation
 │   │   ├── templates.js         # Template management
 │   │   ├── research.js          # Firecrawl integration
-│   │   └── social.js            # Social media APIs
+│   │   ├── social.js            # Social media APIs
+│   │   ├── ai-marketing.js      # Marketing AI endpoints
+│   │   ├── ai-image.js          # Image generation
+│   │   └── vision.js            # Vision analysis
+│   ├── services/                # Business logic
+│   │   ├── chartGenerator.js
+│   │   └── platformOptimizer.js
 │   ├── generated/               # Output documents
 │   ├── uploads/                 # Temporary upload storage
+│   ├── frontend/                # React application (nested)
+│   │   ├── src/
+│   │   │   ├── components/
+│   │   │   │   ├── auth/        # Authentication components
+│   │   │   │   ├── locked/      # Protected brand components
+│   │   │   │   │   ├── BrandHeader.tsx
+│   │   │   │   │   ├── CTASection.tsx
+│   │   │   │   │   ├── ChartContainer.tsx
+│   │   │   │   │   └── RoleCard.tsx
+│   │   │   │   ├── ui/          # Reusable UI components
+│   │   │   │   │   ├── Toast.tsx
+│   │   │   │   │   ├── Confirm.tsx
+│   │   │   │   │   ├── button.tsx
+│   │   │   │   │   ├── card.tsx
+│   │   │   │   │   └── input.tsx
+│   │   │   │   ├── AIAgentsPanel.tsx
+│   │   │   │   ├── ContentEditor.tsx
+│   │   │   │   ├── DocumentPreview.tsx
+│   │   │   │   ├── GeneratePanel.tsx
+│   │   │   │   ├── ImageGenerationStudio.tsx
+│   │   │   │   ├── IntegrationsDemo.tsx
+│   │   │   │   ├── MarketingDashboard.tsx
+│   │   │   │   ├── ResearchPanel.tsx
+│   │   │   │   ├── Settings.tsx
+│   │   │   │   ├── SocialMediaOptimizer.tsx
+│   │   │   │   ├── StyleCustomizer.tsx
+│   │   │   │   ├── TemplateGallery.tsx
+│   │   │   │   └── UploadManager.tsx
+│   │   │   ├── config/
+│   │   │   │   ├── api.ts       # API configuration
+│   │   │   │   ├── brandConfig.ts # Brand constants
+│   │   │   │   └── supabase.ts  # Supabase client
+│   │   │   ├── contexts/
+│   │   │   │   └── AuthContext.tsx # Auth state management
+│   │   │   ├── styles/
+│   │   │   │   ├── brand.locked.css # Immutable brand styles
+│   │   │   │   ├── components.css # Component styles
+│   │   │   │   ├── MarketingDashboard.css
+│   │   │   │   ├── ImageGenerationStudio.css
+│   │   │   │   └── quality-enhanced.css
+│   │   │   ├── utils/
+│   │   │   │   └── styleManager.ts # Style enforcement
+│   │   │   ├── App.tsx          # Main application
+│   │   │   └── App.css          # Application styles
+│   │   └── public/
+│   │       └── index.html       # Entry HTML
 │   └── server.js                # Express server entry
 │
-├── 🎨 frontend/
-│   ├── src/
-│   │   ├── components/
-│   │   │   ├── locked/          # Protected brand components
-│   │   │   │   └── BrandHeader.tsx
-│   │   │   ├── ui/              # Reusable UI components
-│   │   │   │   ├── Toast.tsx
-│   │   │   │   └── Confirm.tsx
-│   │   │   ├── ContentEditor.tsx
-│   │   │   ├── DocumentPreview.tsx
-│   │   │   ├── GeneratePanel.tsx
-│   │   │   ├── ImageGenerationStudio.tsx
-│   │   │   ├── MarketingDashboard.tsx
-│   │   │   ├── ResearchPanel.tsx
-│   │   │   ├── SocialMediaOptimizer.tsx
-│   │   │   └── UploadManager.tsx
-│   │   ├── config/
-│   │   │   ├── api.ts           # API configuration
-│   │   │   └── brandConfig.ts   # Brand constants
-│   │   ├── styles/
-│   │   │   ├── brand.locked.css # Immutable brand styles
-│   │   │   ├── components.css   # Component styles
-│   │   │   └── ImageGenerationStudio.css
-│   │   ├── utils/
-│   │   │   └── styleManager.ts  # Style enforcement
-│   │   ├── App.tsx              # Main application
-│   │   └── App.css              # Application styles
-│   └── public/
-│       └── index.html           # Entry HTML
-│
-├── 📊 data/
-│   └── partners.csv             # Partner firm data
-│
-├── 📚 docs/
+├── 📋 Root Files
+│   ├── generate-pdf.js          # PDF generation script
+│   ├── partners.csv             # Partner firm data
+│   ├── wealth-roles-2025.html   # Static report
+│   ├── wealth-roles-2025-spaced.html # Print-optimized
 │   └── CLAUDE.md                # AI assistant instructions
 │
-└── 📋 Config Files
-    ├── .env.local               # Environment variables
-    ├── .gitignore               # Git ignore rules
-    ├── package.json             # Dependencies
+└── 📦 Config Files
+    ├── package.json             # Root dependencies
     └── README.md                # This file
 ```
 
@@ -344,6 +368,8 @@ wealth-content-studio/
 | POST | `/api/ai/generate-image` | Generate images with Gemini |
 | POST | `/api/vision/analyze` | Analyze uploaded images |
 | POST | `/api/vision/generate-variations` | Create image variations |
+| GET | `/api/ai-agents/capabilities` | List AI agent capabilities |
+| POST | `/api/ai-agents/execute` | Execute AI agent task |
 
 ### Research & Social
 | Method | Endpoint | Description |
@@ -384,7 +410,7 @@ PORT=3001 npm start
 ```
 
 #### API Key Issues
-- Verify `.env.local` exists in both frontend and backend
+- Verify `.env.local` exists in `/backend` and `/backend/frontend`
 - Check API key format and validity
 - Ensure keys have proper permissions
 
@@ -406,10 +432,10 @@ ORDER BY timestamp DESC;
 ### Production Build
 ```bash
 # Build frontend
-cd frontend
+cd backend/frontend
 npm run build
 
-# Build output in frontend/build/
+# Build output in /backend/frontend/build/
 ```
 
 ### Environment Configuration
