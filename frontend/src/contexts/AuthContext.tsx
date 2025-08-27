@@ -267,7 +267,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     
     // Get initial session from Supabase if client is available
     if (supabase) {
-      supabase.auth.getSession().then(({ data: { session } }) => {
+      supabase.auth.getSession().then((response: any) => {
+        const session = response?.data?.session;
         setSession(session);
         setUser(session?.user ?? null);
         
@@ -284,9 +285,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       });
 
       // Listen for auth changes
-      const {
-        data: { subscription },
-      } = supabase.auth.onAuthStateChange(async (event, session) => {
+      const authListener = supabase.auth.onAuthStateChange(async (event: any, session: any) => {
       setSession(session);
       setUser(session?.user ?? null);
       
@@ -309,7 +308,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setLoading(false);
     });
 
-      return () => subscription.unsubscribe();
+      return () => authListener.data.subscription.unsubscribe();
     } else {
       // No supabase client - just mark as not loading
       setLoading(false);
