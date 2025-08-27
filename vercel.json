@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "buildCommand": "cd frontend && npm install && npm run build && cd ../backend && npm install",
+  "buildCommand": "cd frontend && npm install && npm run build",
   "outputDirectory": "frontend/build",
   "framework": "create-react-app",
   "functions": {
@@ -10,20 +10,8 @@
   },
   "rewrites": [
     {
-      "source": "/api/health",
-      "destination": "/api/health"
-    },
-    {
-      "source": "/api/auth/:path*",
-      "destination": "/api/auth"
-    },
-    {
-      "source": "/api/agents/:path*",
-      "destination": "/backend/src/api/agents/:path*"
-    },
-    {
-      "source": "/api/:path*",
-      "destination": "/api/backend"
+      "source": "/api/(.*)",
+      "destination": "/api/$1"
     },
     {
       "source": "/(.*)",
