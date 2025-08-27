@@ -8,9 +8,7 @@
       "maxDuration": 30
     },
     "api/backend.js": {
-      "maxDuration": 30,
-      "memory": 1024,
-      "includeFiles": "**"
+      "maxDuration": 30
     }
   },
   "rewrites": [
