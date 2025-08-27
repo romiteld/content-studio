@@ -309,3 +309,83 @@
     gap: 8px;
   }
 }
+
+/* Access Token Alternative Section */
+.auth-alternative {
+  margin-top: 24px;
+}
+
+.divider {
+  position: relative;
+  text-align: center;
+  margin: 24px 0;
+}
+
+.divider::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: #374151;
+}
+
+.divider span {
+  position: relative;
+  background: #000;
+  padding: 0 16px;
+  color: #6b7280;
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.auth-button.secondary {
+  background: transparent;
+  border: 2px solid #D4AF37;
+  color: #D4AF37;
+}
+
+.auth-button.secondary:hover:not(:disabled) {
+  background: rgba(212, 175, 55, 0.1);
+  border-color: #BE9E44;
+}
+
+.token-input-section {
+  margin-top: 16px;
+  padding: 20px;
+  background: rgba(212, 175, 55, 0.05);
+  border: 1px solid rgba(212, 175, 55, 0.2);
+  border-radius: 12px;
+}
+
+.token-input-section .form-group {
+  margin-bottom: 16px;
+}
+
+
+/* Quick Token Generator Section */
+.quick-token-section {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(212, 175, 55, 0.2);
+}
+
+.quick-token-section .form-group {
+  margin-bottom: 12px;
+}
+
+.quick-token-section .auth-button {
+  width: 100%;
+  justify-content: center;
+}
+
+/* Textarea for token input */
+.form-input[rows] {
+  resize: vertical;
+  min-height: 60px;
+  line-height: 1.4;
+  word-break: break-all;
+}

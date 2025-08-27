@@ -11,11 +11,15 @@ export async function apiFetch<T = any>({ path, headers, ...init }: ApiRequestOp
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 30000);
 
+  // Get auth token from localStorage or sessionStorage
+  const authToken = localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
+
   try {
     const response = await fetch(url, {
       ...init,
       headers: {
         'Content-Type': 'application/json',
+        ...(authToken && { 'Authorization': `Bearer ${authToken}` }),
         ...(headers || {}),
       },
       signal: controller.signal,

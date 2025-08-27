@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { Mail, Key, ArrowRight, AlertCircle, CheckCircle } from 'lucide-react';
 import { SplashCursor } from '../ui/splash-cursor';
+import AccessTokenInput from './AccessTokenInput';
 import '../../styles/auth.css';
 
 interface SignInProps {
@@ -235,6 +236,11 @@ const SignIn: React.FC<SignInProps> = ({ onSuccess }) => {
               </button>
             </div>
           </form>
+        )}
+
+        {/* Access Token Alternative - Only on email step */}
+        {step === 'email' && (
+          <AccessTokenInput onTokenSubmit={() => onSuccess?.()} />
         )}
 
         {/* Company Info */}
