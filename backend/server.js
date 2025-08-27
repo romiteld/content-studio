@@ -55,10 +55,11 @@ app.get('/api/health', (req, res) => {
 });
 
 // Routes
-app.use('/api/content', require('./routes/content'));
+// Use Supabase for content management
+app.use('/api/content', require('./routes/content-supabase'));
 app.use('/api/upload', require('./routes/upload'));
 app.use('/api/generate', require('./routes/generate'));
-app.use('/api/templates', require('./routes/templates'));
+app.use('/api/templates', require('./routes/templates-supabase'));
 app.use('/api/research', require('./routes/research'));
 app.use('/api/social', require('./routes/social'));
 app.use('/api/ai', require('./routes/ai-marketing'));
@@ -73,8 +74,8 @@ app.post('/api/agents/weekly', aiAgents.generateWeeklyContent);
 app.post('/api/agents/visual', aiAgents.generateVisual);
 app.post('/api/agents/validate', aiAgents.validateCompliance);
 
-// Partners API
-app.use('/api/partners', require('./api/partners'));
+// Partners API (using Supabase)
+app.use('/api/partners', require('./api/partners-supabase'));
 
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../frontend/build', 'index.html'));
