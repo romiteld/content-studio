@@ -45,7 +45,15 @@ function AppContent() {
       const data = await apiFetch<any[]>({ path: '/api/content', method: 'GET' });
       setContentItems(data.map((item: any) => ({
         ...item,
-        content_data: JSON.parse(item.content_data)
+        content_data: typeof item.content_data === 'string' 
+          ? (() => {
+              try {
+                return JSON.parse(item.content_data);
+              } catch {
+                return item.content_data; // Return as-is if parsing fails
+              }
+            })()
+          : item.content_data || {} // Already an object or null/undefined
       })));
     } catch (error) {
       console.error('Failed to fetch content:', error);
