@@ -1,5 +1,4 @@
 const { createClient } = require('@supabase/supabase-js');
-const puppeteer = require('puppeteer');
 
 // Initialize Supabase client
 const supabase = createClient(
@@ -182,29 +181,13 @@ module.exports = async (req, res) => {
 
     const html = await generateHTML(contentIds);
     
-    // Use puppeteer for PDF generation
-    const browser = await puppeteer.launch({
-      headless: 'new',
-      args: ['--no-sandbox', '--disable-setuid-sandbox']
-    });
-
-    const page = await browser.newPage();
-    await page.setContent(html, { waitUntil: 'networkidle0' });
+    // For serverless environments, return the HTML directly
+    // The frontend can handle PDF generation client-side using libraries like jsPDF
+    const filename = `${title.replace(/[^a-z0-9]/gi, '_')}_${new Date().toISOString().replace(/[:.]/g, '-')}.html`;
     
-    const pdfBuffer = await page.pdf({
-      format: 'A4',
-      printBackground: true,
-      margin: { top: 0, right: 0, bottom: 0, left: 0 }
-    });
-
-    await browser.close();
-
-    // Return PDF directly
-    const filename = `${title.replace(/[^a-z0-9]/gi, '_')}_${new Date().toISOString().replace(/[:.]/g, '-')}.pdf`;
-    
-    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Type', 'text/html');
     res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
-    res.send(pdfBuffer);
+    res.send(html);
 
   } catch (error) {
     console.error('PDF generation error:', error);

@@ -1,6 +1,5 @@
 const express = require('express');
 const router = express.Router();
-const puppeteer = require('puppeteer');
 const PptxGenJS = require('pptxgenjs');
 const path = require('path');
 const fs = require('fs').promises;
@@ -227,37 +226,25 @@ router.post('/pdf', async (req, res) => {
     }
 
     const html = await generateHTML(contentIds);
-    const browser = await puppeteer.launch({
-      headless: 'new',
-      args: ['--no-sandbox', '--disable-setuid-sandbox']
-    });
-
-    const page = await browser.newPage();
-    await page.setContent(html, { waitUntil: 'networkidle0' });
     
-    const pdfBuffer = await page.pdf({
-      format: 'A4',
-      printBackground: true,
-      margin: { top: 0, right: 0, bottom: 0, left: 0 }
-    });
-
-    await browser.close();
+    // For serverless environments, return HTML for client-side PDF generation
+    const htmlBuffer = Buffer.from(html, 'utf8');
 
     // Save to generated directory
     const generatedDir = path.join(__dirname, '../generated-backend');
     await fs.mkdir(generatedDir, { recursive: true });
     
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-    const filename = `${title.replace(/[^a-z0-9]/gi, '_')}_${timestamp}.pdf`;
+    const filename = `${title.replace(/[^a-z0-9]/gi, '_')}_${timestamp}.html`;
     const filepath = path.join(generatedDir, filename);
     
-    await fs.writeFile(filepath, pdfBuffer);
+    await fs.writeFile(filepath, htmlBuffer);
 
     // Save to Supabase
     const { data, error } = await supabase
       .from('generated_documents')
       .insert({
-        document_type: 'pdf',
+        document_type: 'html',
         title,
         content_ids: contentIds.join(','),
         file_path: filepath,
@@ -270,9 +257,9 @@ router.post('/pdf', async (req, res) => {
       console.error('Error saving document record:', error);
     }
 
-    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Content-Type', 'text/html');
     res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
-    res.send(pdfBuffer);
+    res.send(htmlBuffer);
 
   } catch (error) {
     console.error('PDF generation error:', error);
