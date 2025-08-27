@@ -844,3 +844,60 @@ button:disabled {
     justify-content: center;
   }
 }
+
+/* Invite Code Styles */
+.generated-code-card {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background: linear-gradient(135deg, rgba(46, 163, 242, 0.1) 0%, rgba(190, 158, 68, 0.1) 100%);
+  border: 1px solid rgba(190, 158, 68, 0.3);
+  border-radius: 12px;
+}
+
+.code-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.code-label {
+  font-size: 0.875rem;
+  color: #D4AF37;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.code-display {
+  font-family: 'Courier New', monospace;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 1rem;
+  border-radius: 8px;
+  text-align: center;
+  letter-spacing: 0.1em;
+  user-select: all;
+}
+
+.code-instructions {
+  margin-top: 1rem;
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.7);
+  text-align: center;
+}
+
+.invite-settings {
+  max-width: 500px;
+}
+
+.invite-settings .field-group {
+  margin-bottom: 1.5rem;
+}
+
+.invite-settings .btn-primary {
+  width: 100%;
+  justify-content: center;
+  gap: 0.5rem;
+}

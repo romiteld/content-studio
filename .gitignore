@@ -149,7 +149,7 @@ out/
 
 # Gatsby
 .cache/
-public
+/public
 
 # Nuxt.js
 .nuxt

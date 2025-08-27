@@ -16,7 +16,10 @@ import {
   Edit3,
   Camera,
   Key,
-  UserCheck
+  UserCheck,
+  UserPlus,
+  Copy,
+  Send
 } from 'lucide-react';
 
 const Settings: React.FC = () => {
@@ -34,6 +37,13 @@ const Settings: React.FC = () => {
     theme: 'dark',
     language: 'en'
   });
+
+  // Invite code state
+  const [inviteEmail, setInviteEmail] = useState('');
+  const [inviteRole, setInviteRole] = useState('user');
+  const [inviteMaxUses, setInviteMaxUses] = useState(1);
+  const [generatedCode, setGeneratedCode] = useState('');
+  const [inviteLoading, setInviteLoading] = useState(false);
 
   const handleSave = async () => {
     setLoading(true);
@@ -76,6 +86,46 @@ const Settings: React.FC = () => {
     });
     setIsEditing(false);
     setMessage(null);
+  };
+
+  const generateInviteCode = async () => {
+    setInviteLoading(true);
+    setMessage(null);
+    
+    try {
+      const response = await fetch(`${process.env.REACT_APP_API_URL || 'http://localhost:3001'}/api/auth/create-invite`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('sessionToken')}`
+        },
+        body: JSON.stringify({
+          email: inviteEmail || null,
+          maxUses: inviteMaxUses,
+          expiresInDays: 30,
+          metadata: { role: inviteRole }
+        })
+      });
+
+      const data = await response.json();
+      
+      if (response.ok && data.inviteCode) {
+        setGeneratedCode(data.inviteCode);
+        setMessage({ type: 'success', text: 'Invite code generated successfully!' });
+        setInviteEmail('');
+      } else {
+        setMessage({ type: 'error', text: data.error || 'Failed to generate invite code' });
+      }
+    } catch (error) {
+      setMessage({ type: 'error', text: 'Failed to generate invite code' });
+    } finally {
+      setInviteLoading(false);
+    }
+  };
+
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(generatedCode);
+    setMessage({ type: 'success', text: 'Invite code copied to clipboard!' });
   };
 
   return (
@@ -151,6 +201,15 @@ const Settings: React.FC = () => {
               <Globe className="nav-icon" />
               <span>Preferences</span>
             </button>
+            {profile?.role === 'admin' && (
+              <button 
+                className={`nav-item ${activeTab === 'invites' ? 'active' : ''}`}
+                onClick={() => setActiveTab('invites')}
+              >
+                <UserPlus className="nav-icon" />
+                <span>Invite Users</span>
+              </button>
+            )}
           </nav>
           
           <div className="sidebar-footer">
@@ -441,6 +500,92 @@ const Settings: React.FC = () => {
                     <option value="de">Deutsch</option>
                   </select>
                 </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'invites' && profile?.role === 'admin' && (
+            <div className="content-section">
+              <div className="section-header">
+                <div className="section-title-group">
+                  <h2 className="section-title">Invite Users</h2>
+                  <p className="section-description">Generate invite codes for new users</p>
+                </div>
+              </div>
+
+              <div className="invite-settings">
+                <div className="field-group">
+                  <label className="field-label">
+                    <Mail className="field-icon" />
+                    Email (Optional)
+                  </label>
+                  <input
+                    type="email"
+                    className="field-input"
+                    placeholder="user@example.com"
+                    value={inviteEmail}
+                    onChange={(e) => setInviteEmail(e.target.value)}
+                  />
+                  <span className="field-hint">Leave empty for a general invite code</span>
+                </div>
+
+                <div className="field-group">
+                  <label className="field-label">
+                    <UserCheck className="field-icon" />
+                    Role
+                  </label>
+                  <select 
+                    className="field-input"
+                    value={inviteRole}
+                    onChange={(e) => setInviteRole(e.target.value)}
+                  >
+                    <option value="user">User</option>
+                    <option value="partner">Partner</option>
+                    <option value="admin">Admin</option>
+                  </select>
+                </div>
+
+                <div className="field-group">
+                  <label className="field-label">
+                    <Key className="field-icon" />
+                    Max Uses
+                  </label>
+                  <input
+                    type="number"
+                    className="field-input"
+                    min="1"
+                    max="100"
+                    value={inviteMaxUses}
+                    onChange={(e) => setInviteMaxUses(parseInt(e.target.value) || 1)}
+                  />
+                  <span className="field-hint">How many times this code can be used</span>
+                </div>
+
+                <button
+                  className="btn-primary"
+                  onClick={generateInviteCode}
+                  disabled={inviteLoading}
+                >
+                  <UserPlus className="icon-sm" />
+                  Generate Invite Code
+                </button>
+
+                {generatedCode && (
+                  <div className="generated-code-card">
+                    <div className="code-header">
+                      <span className="code-label">Generated Invite Code</span>
+                      <button className="btn-icon" onClick={copyToClipboard}>
+                        <Copy className="icon-sm" />
+                      </button>
+                    </div>
+                    <div className="code-display">
+                      {generatedCode}
+                    </div>
+                    <div className="code-instructions">
+                      Share this code with the user. They'll need it to register.
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           )}

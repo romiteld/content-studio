@@ -51,22 +51,25 @@ app.get('/api/health', (req, res) => {
 });
 
 // Routes
-app.use('/api/content', require('./server-routes/content'));
-app.use('/api/upload', require('./server-routes/upload'));
-app.use('/api/generate', require('./server-routes/generate'));
-app.use('/api/templates', require('./server-routes/templates'));
-app.use('/api/research', require('./server-routes/research'));
+app.use('/api/content', require('./server-routes/content-supabase'));
+app.use('/api/upload', require('./server-routes/upload-supabase'));
+app.use('/api/generate', require('./server-routes/generate-supabase'));
+app.use('/api/templates', require('./server-routes/templates-supabase'));
+app.use('/api/research', require('./server-routes/research-supabase'));
 app.use('/api/social', require('./server-routes/social'));
 app.use('/api/ai', require('./server-routes/ai-marketing'));
 app.use('/api/ai/image', require('./server-routes/ai-image'));
 app.use('/api/vision', require('./server-routes/vision'));
-app.use('/api/brand', require('./server-routes/brand'));
+app.use('/api/brand', require('./server-routes/brand-supabase'));
 
 // AI Agents Endpoints (These are now handled by Vercel Functions)
 // app.use('/api/agents', require('./api/ai-agents'));
 
+// Auth API
+app.use('/api/auth', require('./server-routes/auth-supabase'));
+
 // Partners API
-app.use('/api/partners', require('./server-api/partners'));
+app.use('/api/partners', require('./server-api/partners-supabase'));
 
 // Error handling
 app.use((err, req, res, next) => {
