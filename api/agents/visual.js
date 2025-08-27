@@ -1,38 +1,28 @@
-import { google } from '@ai-sdk/google';
-import { generateText } from 'ai';
+const { google } = require('@ai-sdk/google');
+const { generateText } = require('ai');
 
-export const config = {
-  runtime: 'edge',
-  maxDuration: 30,
-};
-
-export default async function handler(req) {
-  const headers = {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Methods': 'POST, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type',
-  };
+module.exports = async (req, res) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
   if (req.method === 'OPTIONS') {
-    return new Response(null, { status: 200, headers });
+    return res.status(200).end();
   }
 
   if (req.method !== 'POST') {
-    return new Response(JSON.stringify({ error: 'Method not allowed' }), {
-      status: 405,
-      headers: { ...headers, 'Content-Type': 'application/json' },
-    });
+    return res.status(405).json({ error: 'Method not allowed' });
   }
 
   try {
-    const { action, params } = await req.json();
+    const { action, params } = req.body;
     
     let prompt = '';
     
     switch(action) {
       case 'specs':
-        prompt = `Create detailed visual specifications for a ${params.contentType} for wealth management content.
-        Context: ${JSON.stringify(params.context || {})}
+        prompt = `Create detailed visual specifications for a ${params?.contentType} for wealth management content.
+        Context: ${JSON.stringify(params?.context || {})}
         
         Brand colors: Black, Gold (#D4AF37), Cyan (#4FC3F7)
         
@@ -64,9 +54,9 @@ export default async function handler(req) {
         break;
         
       case 'prompt':
-        prompt = `Create a detailed image generation prompt for: ${params.description}
+        prompt = `Create a detailed image generation prompt for: ${params?.description}
         
-        Style: ${params.style || 'professional'}
+        Style: ${params?.style || 'professional'}
         Context: Wealth management professional content
         Brand colors to incorporate: Black, Gold (#D4AF37), Cyan (#4FC3F7)
         
@@ -79,7 +69,7 @@ export default async function handler(req) {
         break;
         
       case 'analyze':
-        prompt = `Analyze visual content requirements for: ${params.content}
+        prompt = `Analyze visual content requirements for: ${params?.content}
         
         Provide recommendations for:
         1. Visual hierarchy
@@ -90,10 +80,7 @@ export default async function handler(req) {
         break;
         
       default:
-        return new Response(JSON.stringify({ error: `Unknown action: ${action}` }), {
-          status: 400,
-          headers: { ...headers, 'Content-Type': 'application/json' },
-        });
+        return res.status(400).json({ error: `Unknown action: ${action}` });
     }
 
     const result = await generateText({
@@ -116,21 +103,15 @@ export default async function handler(req) {
       }
     }
 
-    return new Response(JSON.stringify({ 
+    res.status(200).json({ 
       success: true, 
       result: parsedResult,
       action,
       timestamp: new Date().toISOString()
-    }), {
-      status: 200,
-      headers: { ...headers, 'Content-Type': 'application/json' },
     });
     
   } catch (error) {
     console.error('Visual generation error:', error);
-    return new Response(JSON.stringify({ error: error.message }), {
-      status: 500,
-      headers: { ...headers, 'Content-Type': 'application/json' },
-    });
+    res.status(500).json({ error: error.message });
   }
-}
+};

@@ -1,31 +1,21 @@
-import { google } from '@ai-sdk/google';
-import { generateText, streamText } from 'ai';
+const { google } = require('@ai-sdk/google');
+const { generateText, streamText } = require('ai');
 
-export const config = {
-  runtime: 'edge',
-  maxDuration: 30,
-};
-
-export default async function handler(req) {
-  const headers = {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Methods': 'POST, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type',
-  };
+module.exports = async (req, res) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
   if (req.method === 'OPTIONS') {
-    return new Response(null, { status: 200, headers });
+    return res.status(200).end();
   }
 
   if (req.method !== 'POST') {
-    return new Response(JSON.stringify({ error: 'Method not allowed' }), {
-      status: 405,
-      headers: { ...headers, 'Content-Type': 'application/json' },
-    });
+    return res.status(405).json({ error: 'Method not allowed' });
   }
 
   try {
-    const { action, params = {} } = await req.json();
+    const { action, params = {} } = req.body;
     
     switch(action) {
       case 'calendar': {
@@ -75,22 +65,16 @@ export default async function handler(req) {
           };
         }
 
-        return new Response(JSON.stringify({ 
+        return res.status(200).json({ 
           success: true, 
           data: calendar,
           timestamp: new Date().toISOString()
-        }), {
-          status: 200,
-          headers: { ...headers, 'Content-Type': 'application/json' },
         });
       }
       
       case 'batch': {
         if (!params.topics || !Array.isArray(params.topics)) {
-          return new Response(JSON.stringify({ error: 'Topics array is required for batch generation' }), {
-            status: 400,
-            headers: { ...headers, 'Content-Type': 'application/json' },
-          });
+          return res.status(400).json({ error: 'Topics array is required for batch generation' });
         }
 
         const results = [];
@@ -115,13 +99,10 @@ export default async function handler(req) {
           });
         }
 
-        return new Response(JSON.stringify({ 
+        return res.status(200).json({ 
           success: true, 
           data: results,
           timestamp: new Date().toISOString()
-        }), {
-          status: 200,
-          headers: { ...headers, 'Content-Type': 'application/json' },
         });
       }
       
@@ -130,35 +111,29 @@ export default async function handler(req) {
         const prompt = `Generate a comprehensive weekly content plan for: ${topic}
         Include diverse content types, engagement strategies, and measurement metrics.`;
 
-        const result = await streamText({
+        const result = await generateText({
           model: google('gemini-2.0-flash-exp'),
           prompt,
           temperature: 0.7,
           maxTokens: 3000,
         });
 
-        return new Response(result.toDataStreamResponse().body, {
-          headers: {
-            ...headers,
-            'Content-Type': 'text/event-stream',
-            'Cache-Control': 'no-cache',
-            'Connection': 'keep-alive',
+        return res.status(200).json({ 
+          success: true, 
+          data: {
+            topic,
+            plan: result.text
           },
+          timestamp: new Date().toISOString()
         });
       }
       
       default:
-        return new Response(JSON.stringify({ error: `Unknown action: ${action}` }), {
-          status: 400,
-          headers: { ...headers, 'Content-Type': 'application/json' },
-        });
+        return res.status(400).json({ error: `Unknown action: ${action}` });
     }
     
   } catch (error) {
     console.error('Weekly content generation error:', error);
-    return new Response(JSON.stringify({ error: error.message }), {
-      status: 500,
-      headers: { ...headers, 'Content-Type': 'application/json' },
-    });
+    res.status(500).json({ error: error.message });
   }
-}
+};

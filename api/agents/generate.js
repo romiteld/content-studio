@@ -1,5 +1,5 @@
 const { google } = require('@ai-sdk/google');
-const { streamText } = require('ai');
+const { generateText } = require('ai');
 
 module.exports = async (req, res) => {
   // Enable CORS
@@ -47,28 +47,22 @@ module.exports = async (req, res) => {
         return res.status(400).json({ error: `Unknown content type: ${type}` });
     }
 
-    const result = await streamText({
+    const result = await generateText({
       model: google('gemini-2.0-flash-exp'),
       prompt,
       temperature: 0.7,
       maxTokens: 2000,
     });
 
-    // Return streaming response
-    res.setHeader('Content-Type', 'text/event-stream');
-    res.setHeader('Cache-Control', 'no-cache');
-    res.setHeader('Connection', 'keep-alive');
-    
-    const stream = result.toDataStreamResponse();
-    const reader = stream.body.getReader();
-    
-    while (true) {
-      const { done, value } = await reader.read();
-      if (done) break;
-      res.write(value);
-    }
-    
-    res.end();
+    res.status(200).json({ 
+      success: true, 
+      content: {
+        type,
+        text: result.text,
+        date: params?.date || new Date().toISOString()
+      },
+      timestamp: new Date().toISOString()
+    });
     
   } catch (error) {
     console.error('Content generation error:', error);
