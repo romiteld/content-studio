@@ -5,11 +5,9 @@
   "framework": "create-react-app",
   "functions": {
     "api/agents/*.js": {
-      "runtime": "nodejs20.x",
       "maxDuration": 30
     },
     "api/backend.js": {
-      "runtime": "nodejs20.x",
       "maxDuration": 30,
       "memory": 1024,
       "includeFiles": "**"
