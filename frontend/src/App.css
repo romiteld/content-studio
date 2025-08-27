@@ -1296,6 +1296,35 @@ input:focus, textarea:focus, select:focus {
   }
 }
 
+@media (max-width: 1024px) {
+  .preview-toggle {
+    position: relative;
+    right: auto;
+  }
+  
+  .app-nav-inner {
+    justify-content: flex-start;
+  }
+  
+  .app-nav {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .app-nav::-webkit-scrollbar {
+    height: 4px;
+  }
+  
+  .app-nav::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.02);
+  }
+  
+  .app-nav::-webkit-scrollbar-thumb {
+    background: rgba(190, 158, 68, 0.3);
+    border-radius: 2px;
+  }
+}
+
 @media (max-width: 960px) {
   .app-main {
     flex-direction: column;
@@ -1315,22 +1344,27 @@ input:focus, textarea:focus, select:focus {
     max-height: 300px;
   }
   
-  .app-nav {
+  .nav-tab {
+    padding: 0.65rem 1.25rem;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .app-nav-inner {
+    flex-wrap: nowrap;
     overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
   }
   
-  .app-nav::-webkit-scrollbar {
-    height: 4px;
+  .nav-tab {
+    white-space: nowrap;
+    min-width: fit-content;
+    padding: 0.6rem 1rem;
+    font-size: 0.85rem;
   }
   
-  .app-nav::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.02);
-  }
-  
-  .app-nav::-webkit-scrollbar-thumb {
-    background: rgba(190, 158, 68, 0.3);
-    border-radius: 2px;
+  .app-nav {
+    padding: 0.5rem 1rem;
   }
 }
 

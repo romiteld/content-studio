@@ -1,6 +1,6 @@
 // Centralized API helper with env-based base URL and sensible defaults
 export const API_BASE_URL =
-  (process.env.REACT_APP_API_BASE_URL || 'http://localhost:3001').replace(/\/$/, '');
+  (process.env.REACT_APP_API_URL || process.env.REACT_APP_API_BASE_URL || 'http://localhost:3001').replace(/\/$/, '');
 
 export type ApiRequestOptions = RequestInit & {
   path: string;
@@ -14,14 +14,25 @@ export async function apiFetch<T = any>({ path, headers, ...init }: ApiRequestOp
   // Get auth token from localStorage or sessionStorage
   const authToken = localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
 
+  // Build headers object safely
+  const requestHeaders: Record<string, string> = {
+    'Content-Type': 'application/json',
+  };
+  
+  // Only add Authorization header if token exists and is valid
+  if (authToken && authToken.length > 0) {
+    requestHeaders['Authorization'] = `Bearer ${authToken}`;
+  }
+  
+  // Merge additional headers
+  if (headers) {
+    Object.assign(requestHeaders, headers);
+  }
+
   try {
     const response = await fetch(url, {
       ...init,
-      headers: {
-        'Content-Type': 'application/json',
-        ...(authToken && { 'Authorization': `Bearer ${authToken}` }),
-        ...(headers || {}),
-      },
+      headers: requestHeaders,
       signal: controller.signal,
     });
 
