@@ -1,140 +1,129 @@
 {
-  "timestamp": "2025-08-27T20:41:58.598Z",
+  "timestamp": "2025-08-27T20:44:23.281Z",
   "url": "https://studio.thewell.solutions",
   "summary": {
     "total": 19,
-    "working": 7,
-    "broken": 12,
-    "success_rate": "36.8%"
+    "working": 18,
+    "broken": 1,
+    "success_rate": "94.7%"
   },
   "working_endpoints": [
     {
       "name": "Frontend Home",
       "path": "/",
       "method": "GET",
-      "duration": 193
+      "duration": 215
     },
     {
       "name": "API Health",
       "path": "/api/health",
       "method": "GET",
-      "duration": 209
+      "duration": 257
     },
     {
       "name": "AI Chat",
       "path": "/api/ai-chat",
       "method": "POST",
-      "duration": 635
+      "duration": 717
     },
-    {
-      "name": "Auth Session",
-      "path": "/api/auth/session",
-      "method": "GET",
-      "duration": 164
-    },
-    {
-      "name": "Get Content",
-      "path": "/api/content",
-      "method": "GET",
-      "duration": 174
-    },
-    {
-      "name": "Get Templates",
-      "path": "/api/templates",
-      "method": "GET",
-      "duration": 172
-    },
-    {
-      "name": "Get Brand Settings",
-      "path": "/api/brand",
-      "method": "GET",
-      "duration": 167
-    }
-  ],
-  "broken_endpoints": [
     {
       "name": "Auth Register",
       "path": "/api/auth/register",
       "method": "POST",
-      "status": 405,
-      "error": ""
-    },
-    {
-      "name": "Auth Login",
-      "path": "/api/auth/login",
-      "method": "POST",
-      "status": 405,
-      "error": ""
+      "duration": 694
     },
     {
       "name": "Auth Logout",
       "path": "/api/auth/logout",
       "method": "POST",
-      "status": 405,
-      "error": ""
+      "duration": 234
+    },
+    {
+      "name": "Auth Session",
+      "path": "/api/auth/session",
+      "method": "GET",
+      "duration": 235
+    },
+    {
+      "name": "Get Content",
+      "path": "/api/content",
+      "method": "GET",
+      "duration": 278
     },
     {
       "name": "Create Content",
       "path": "/api/content",
       "method": "POST",
-      "status": 405,
-      "error": ""
+      "duration": 250
+    },
+    {
+      "name": "Get Templates",
+      "path": "/api/templates",
+      "method": "GET",
+      "duration": 286
     },
     {
       "name": "Create Template",
       "path": "/api/templates",
       "method": "POST",
-      "status": 405,
-      "error": ""
+      "duration": 261
     },
     {
       "name": "AI Image Generation",
       "path": "/api/ai-image",
       "method": "POST",
-      "status": 405,
-      "error": ""
+      "duration": 277
     },
     {
       "name": "PDF Generation",
       "path": "/api/generate-pdf",
       "method": "POST",
-      "status": 405,
-      "error": ""
+      "duration": 252
     },
     {
       "name": "Marketing Analysis",
       "path": "/api/ai-marketing/analyze",
       "method": "POST",
-      "status": 405,
-      "error": ""
+      "duration": 239
+    },
+    {
+      "name": "Get Brand Settings",
+      "path": "/api/brand",
+      "method": "GET",
+      "duration": 236
     },
     {
       "name": "Update Brand",
       "path": "/api/brand",
       "method": "POST",
-      "status": 405,
-      "error": ""
+      "duration": 214
     },
     {
       "name": "Research Search",
       "path": "/api/research/search",
       "method": "POST",
-      "status": 405,
-      "error": ""
+      "duration": 244
     },
     {
       "name": "Social Optimize",
       "path": "/api/social/optimize",
       "method": "POST",
-      "status": 405,
-      "error": ""
+      "duration": 236
     },
     {
       "name": "Vision Analysis",
       "path": "/api/vision/analyze",
       "method": "POST",
-      "status": 405,
-      "error": ""
+      "duration": 228
+    }
+  ],
+  "broken_endpoints": [
+    {
+      "name": "Auth Login",
+      "path": "/api/auth/login",
+      "method": "POST",
+      "status": 401,
+      "error": "{\"error\":\"Invalid login credentials\"}"
     }
   ]
 }
