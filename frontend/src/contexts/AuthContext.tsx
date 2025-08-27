@@ -3,6 +3,8 @@ import { User, Session, AuthError } from '@supabase/supabase-js';
 import { supabase } from '../config/supabase';
 import { verifySupabaseJWT, extractUserFromJWT } from '../utils/jwtVerification';
 
+const SUPABASE_URL = process.env.REACT_APP_SUPABASE_URL || '';
+
 interface UserProfile {
   id: string;
   email: string;
@@ -193,6 +195,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const storedToken = localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
     
     if (storedToken && storedToken.startsWith('eyJ')) { // JWT tokens start with eyJ
+      // Only verify JWT if Supabase is properly configured
+      if (!SUPABASE_URL || !SUPABASE_URL.includes('supabase.co')) {
+        console.warn('Supabase not properly configured, skipping JWT verification');
+        // Clear the invalid token
+        localStorage.removeItem('authToken');
+        sessionStorage.removeItem('authToken');
+        setLoading(false);
+        return;
+      }
+      
       // Verify the token properly using JWKS
       verifySupabaseJWT(storedToken).then(({ valid, payload, error }) => {
         if (valid && payload) {
@@ -252,16 +264,20 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           setLoading(false);
           return;
         } else {
-          console.error('JWT verification failed:', error);
+          console.warn('JWT verification failed:', error);
           // Clear invalid token
           localStorage.removeItem('authToken');
           sessionStorage.removeItem('authToken');
         }
       }).catch(error => {
-        console.error('Error verifying JWT:', error);
+        console.warn('Error during JWT verification:', error);
+        // Clear the token on verification errors
+        localStorage.removeItem('authToken');
+        sessionStorage.removeItem('authToken');
       });
       
       // Don't continue to Supabase session check if we're processing a JWT
+      setLoading(false);
       return;
     }
     

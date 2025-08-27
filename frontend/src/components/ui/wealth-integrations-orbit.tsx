@@ -224,10 +224,10 @@ export default function WealthIntegrationsOrbit({
 
         {/* Integration status indicators */}
         <div className="mt-8 flex flex-wrap justify-center gap-2 max-w-md">
-          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100">
             5 Financial Tools Connected
           </span>
-          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+          <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-800 dark:text-blue-100">
             4 Social Platforms Active
           </span>
         </div>

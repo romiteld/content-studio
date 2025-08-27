@@ -196,44 +196,51 @@ export default function MarketingDashboard() {
           <button 
             className={`nav-button ${activeView === 'dashboard' ? 'active' : ''}`}
             onClick={() => setActiveView('dashboard')}
+            data-label="Dashboard"
           >
-            <Layout /> Dashboard
+            <Layout /> <span className="nav-button-text">Dashboard</span>
           </button>
           <button 
             className={`nav-button ${activeView === 'campaign' ? 'active' : ''}`}
             onClick={() => setActiveView('campaign')}
+            data-label="Campaigns"
           >
-            <TrendingUp /> Campaigns
+            <TrendingUp /> <span className="nav-button-text">Campaigns</span>
           </button>
           <button 
             className={`nav-button ${activeView === 'content' ? 'active' : ''}`}
             onClick={() => setActiveView('content')}
+            data-label="Content"
           >
-            <FileText /> Content
+            <FileText /> <span className="nav-button-text">Content</span>
           </button>
           <button 
             className={`nav-button ${activeView === 'templates' ? 'active' : ''}`}
             onClick={() => setActiveView('templates')}
+            data-label="Templates"
           >
-            <Layers /> Templates
+            <Layers /> <span className="nav-button-text">Templates</span>
           </button>
           <button 
             className={`nav-button ${activeView === 'studio' ? 'active' : ''}`}
             onClick={() => setActiveView('studio')}
+            data-label="Studio"
           >
-            <Wand2 /> Studio
+            <Wand2 /> <span className="nav-button-text">Studio</span>
           </button>
           <button 
             className={`nav-button ${activeView === 'agents' ? 'active' : ''}`}
             onClick={() => setActiveView('agents')}
+            data-label="AI Agents"
           >
-            <Bot /> AI Agents
+            <Bot /> <span className="nav-button-text">AI Agents</span>
           </button>
           <button 
             className={`nav-button ${activeView === 'calendar' ? 'active' : ''}`}
             onClick={() => setActiveView('calendar')}
+            data-label="Calendar"
           >
-            <Calendar /> Calendar
+            <Calendar /> <span className="nav-button-text">Calendar</span>
           </button>
         </nav>
       </header>

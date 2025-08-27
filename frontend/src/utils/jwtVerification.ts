@@ -43,7 +43,9 @@ interface JWTPayload {
   amr?: Array<{ method: string; timestamp: number }>;
 }
 
-const SUPABASE_PROJECT_ID = 'rqtpemdvwuzswnpvnljm';
+// Extract project ID from the Supabase URL environment variable
+const SUPABASE_URL = process.env.REACT_APP_SUPABASE_URL || '';
+const SUPABASE_PROJECT_ID = SUPABASE_URL ? SUPABASE_URL.split('.')[0].replace('https://', '') : 'rqtpemdvwuzswnpvnljm';
 const JWKS_URL = `https://${SUPABASE_PROJECT_ID}.supabase.co/auth/v1/.well-known/jwks.json`;
 
 // Cache for JWKS to avoid repeated fetches

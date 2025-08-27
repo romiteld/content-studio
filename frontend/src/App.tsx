@@ -11,6 +11,7 @@ import './styles/enhanced-layout.css';
 import './styles/global-layout.css';
 import './styles/auth.css';
 import './styles/settings.css';
+import './styles/mobile-responsive.css';
 import './App.css';
 import BrandHeader from './components/locked/BrandHeader';
 import ContentEditor from './components/ContentEditor';
