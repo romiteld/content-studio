@@ -20,12 +20,7 @@ uploads-backend/
 generated/
 *.pdf
 
-# Database files
-*.db
-*.sqlite
-*.sqlite3
-database/*.db
-wealth_training.db
+# Database - using Supabase cloud (no local database files)
 
 # Backend cleanup
 backend/

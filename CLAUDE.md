@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Wealth Management Content Studio - An AI-powered training material generator with enterprise brand lock system. Full-stack application with React frontend, Express backend, SQLite database, and integrations with Google Gemini AI and Firecrawl for research.
+Wealth Management Content Studio - An AI-powered training material generator with enterprise brand lock system. Full-stack application with React frontend, Express backend, Supabase database, and integrations with Google Gemini AI and Firecrawl for research.
 
 ## Commands
 
@@ -19,12 +19,8 @@ cd backend && npm start
 cd backend/frontend && npm start
 ```
 
-**Initialize/Reset Database:**
-```bash
-cd backend
-node database/init.js
-node database/import-partners.js  # Import partner firm data
-```
+**Database Setup:**
+Database is managed through Supabase cloud platform - no local initialization needed.
 
 **Build Production Frontend:**
 ```bash
@@ -42,7 +38,7 @@ node generate-pdf.js  # Creates PDF from wealth-roles-2025-spaced.html
 
 - `/backend` - Express server (port 3001)
   - `/api` - AI integrations (Gemini marketing, vision, agents)
-  - `/database` - SQLite database and schema
+  - `/database` - Supabase client configuration
   - `/routes` - API endpoints
   - `/generated` - Output PDFs and PowerPoints
   - `/uploads` - Temporary file storage
@@ -74,7 +70,7 @@ node generate-pdf.js  # Creates PDF from wealth-roles-2025-spaced.html
 
 ### Database Schema
 
-Core tables in `wealth_training.db`:
+Core tables in Supabase:
 - `content` - Training material sections with JSON content_data
 - `templates` - Locked presentation templates (immutable)
 - `uploads` - Processed file tracking  
@@ -106,6 +102,9 @@ Create `.env.local` files:
 PORT=3001
 GEMINI_API_KEY=your_gemini_api_key
 FIRECRAWL_API_KEY=your_firecrawl_api_key
+SUPABASE_URL=your_supabase_url
+SUPABASE_ANON_KEY=your_supabase_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
 ```
 
 **Frontend (`/backend/frontend/.env.local`):**
@@ -146,6 +145,6 @@ REACT_APP_API_URL=http://localhost:3001
 
 ### Common Issues
 - **Port conflicts**: Backend uses 3001, Frontend uses 3000
-- **Database locked**: Stop server, delete `.db` file, run `init.js`
+- **Database issues**: Check Supabase dashboard and connection credentials
 - **CORS errors**: Ensure backend is running before frontend
 - **Style overrides**: Check console and database logs

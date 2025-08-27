@@ -1,28 +1,21 @@
-export const config = {
-  runtime: 'edge',
-};
-
-export default async function handler(req) {
-  const headers = {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type',
-  };
+module.exports = async (req, res) => {
+  // Enable CORS
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
   if (req.method === 'OPTIONS') {
-    return new Response(null, { status: 200, headers });
+    return res.status(200).end();
   }
 
-  return new Response(JSON.stringify({
+  res.status(200).json({
     success: true,
     message: 'Test endpoint working',
     method: req.method,
     env: {
       hasGoogleKey: !!process.env.GOOGLE_AI_API_KEY,
-      keys: Object.keys(process.env).filter(k => k.includes('GOOGLE') || k.includes('AI'))
+      nodeVersion: process.version,
+      keys: Object.keys(process.env).filter(k => k.includes('GOOGLE') || k.includes('AI')).map(k => k.substring(0, 10) + '...')
     }
-  }), {
-    status: 200,
-    headers: { ...headers, 'Content-Type': 'application/json' },
   });
-}
+};
