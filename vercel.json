@@ -4,13 +4,7 @@
   "outputDirectory": "frontend/build",
   "framework": "create-react-app",
   "functions": {
-    "backend/src/api/agents/*.js": {
-      "maxDuration": 30
-    },
-    "backend/src/api/*.js": {
-      "maxDuration": 30
-    },
-    "api/*.js": {
+    "api/**/*.js": {
       "maxDuration": 30
     }
   },
