@@ -1,4 +1,5 @@
 const brandConfig = {
+  // Core brand colors - protected
   colors: {
     primary: '#000000',
     secondary: '#000000',
@@ -12,6 +13,10 @@ const brandConfig = {
     textMuted: '#9A9A9A',
     darkText: '#1a1a1a'
   },
+  
+  // Style modifications allowed
+  allowStyleOverrides: true,
+  protectedProperties: ['brand-colors', 'logo', 'fonts'],
   
   fonts: {
     primary: "'Inter', 'Arial', 'Helvetica', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif",

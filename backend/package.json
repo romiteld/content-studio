@@ -13,6 +13,8 @@
     "@langchain/core": "^0.3.72",
     "@langchain/langgraph": "^0.4.6",
     "ai": "^5.0.25",
+    "axios": "^1.11.0",
+    "better-sqlite3": "^12.2.0",
     "cors": "^2.8.5",
     "csv-parse": "^6.1.0",
     "dompurify": "^3.0.6",

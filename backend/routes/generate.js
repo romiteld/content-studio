@@ -145,7 +145,8 @@ router.post('/pdf', async (req, res) => {
     
     const browser = await puppeteer.launch({
       headless: true,
-      args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage']
+      args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-dev-shm-usage'],
+      executablePath: '/home/romiteld/.cache/puppeteer/chrome/linux-121.0.6167.85/chrome-linux64/chrome'
     });
     
     const page = await browser.newPage();

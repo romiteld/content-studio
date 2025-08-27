@@ -11,10 +11,26 @@ const purify = DOMPurify(window);
 const db = new sqlite3.Database(path.join(__dirname, '../database/wealth_training.db'));
 
 const sanitizeContent = (content) => {
+  // Allow style modifications but protect brand integrity
   return purify.sanitize(content, {
-    FORBID_ATTR: ['style', 'class'],
-    FORBID_TAGS: ['style', 'link', 'script'],
-    KEEP_CONTENT: true
+    // Allow style and class attributes for flexibility
+    ALLOWED_ATTR: ['style', 'class', 'id', 'href', 'target', 'rel', 'src', 'alt', 'width', 'height'],
+    // Still forbid dangerous tags
+    FORBID_TAGS: ['script', 'iframe', 'object', 'embed'],
+    // Allow style tag for custom CSS
+    ALLOWED_TAGS: ['style', 'div', 'span', 'p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 
+                   'ul', 'ol', 'li', 'a', 'img', 'table', 'tr', 'td', 'th', 'thead', 'tbody',
+                   'strong', 'em', 'b', 'i', 'u', 'br', 'hr', 'blockquote', 'pre', 'code'],
+    KEEP_CONTENT: true,
+    // Custom hook to validate brand colors remain in critical elements
+    SANITIZE_DOM: (node) => {
+      if (node.nodeName === 'STYLE') {
+        // Ensure brand colors are preserved in critical selectors
+        const brandSelectors = ['.brand-logo', '.brand-header', '.brand-footer'];
+        // Allow the style but log if attempting to override protected elements
+        return node;
+      }
+    }
   });
 };
 

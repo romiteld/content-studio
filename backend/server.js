@@ -41,7 +41,7 @@ const upload = multer({
     if (mimetype && extname) {
       return cb(null, true);
     } else {
-      cb('Error: Invalid file type. Only training materials allowed.');
+      cb('Error: Invalid file type. Only content files allowed.');
     }
   }
 });
@@ -54,42 +54,16 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', brand: 'locked' });
 });
 
-const contentRoutes = require('./routes/content');
-const uploadRoutes = require('./routes/upload');
-const generateRoutes = require('./routes/generate');
-const templateRoutes = require('./routes/templates');
-const researchRoutes = require('./routes/research');
-const socialRoutes = require('./routes/social');
-
-// AI Marketing Routes
-const geminiMarketing = require('./api/gemini-marketing-ai');
-
-app.use('/api/content', contentRoutes);
-app.use('/api/upload', uploadRoutes);
-app.use('/api/generate', generateRoutes);
-app.use('/api/templates', templateRoutes);
-app.use('/api/research', researchRoutes);
-app.use('/api/social', socialRoutes);
-
-// Gemini AI Marketing Endpoints
-app.post('/api/ai/campaign', geminiMarketing.createCampaign);
-app.post('/api/ai/quick-generate', geminiMarketing.quickGenerate);
-app.post('/api/ai/generate-image', geminiMarketing.generateImage);
-app.post('/api/ai/edit-image', geminiMarketing.editImage);
-app.post('/api/ai/content-with-visuals', geminiMarketing.generateContentWithVisuals);
-app.get('/api/ai/campaign/:campaignId', geminiMarketing.getCampaign);
-app.get('/api/ai/campaigns', geminiMarketing.listCampaigns);
-
-// Gemini Vision & Image Generation Endpoints
-const geminiVision = require('./api/gemini-vision');
-app.post('/api/vision/analyze', upload.single('image'), geminiVision.analyzeMarketingImage);
-app.post('/api/vision/generate-specs', geminiVision.generateVisualSpecs);
-app.post('/api/vision/content-variations', geminiVision.generateContentVariations);
-app.post('/api/vision/campaign-consistency', upload.array('images', 10), geminiVision.analyzeCampaignConsistency);
-app.post('/api/vision/generate-prompt', geminiVision.generateImagePrompt);
-app.post('/api/vision/edit-instructions', upload.single('image'), geminiVision.generateImageEditInstructions);
-app.post('/api/vision/generate-variations', geminiVision.generateImageVariations);
-app.post('/api/vision/generate-code', geminiVision.generateCodeFromSpecs);
+// Routes
+app.use('/api/content', require('./routes/content'));
+app.use('/api/upload', require('./routes/upload'));
+app.use('/api/generate', require('./routes/generate'));
+app.use('/api/templates', require('./routes/templates'));
+app.use('/api/research', require('./routes/research'));
+app.use('/api/social', require('./routes/social'));
+app.use('/api/ai', require('./routes/ai-marketing'));
+app.use('/api/vision', require('./routes/vision'));
+app.use('/api/brand', require('./routes/brand'));
 
 // AI Agents Endpoints
 const aiAgents = require('./api/ai-agents');
@@ -97,6 +71,9 @@ app.post('/api/agents/generate', aiAgents.generateContent);
 app.post('/api/agents/weekly', aiAgents.generateWeeklyContent);
 app.post('/api/agents/visual', aiAgents.generateVisual);
 app.post('/api/agents/validate', aiAgents.validateCompliance);
+
+// Partners API
+app.use('/api/partners', require('./api/partners'));
 
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../frontend/build', 'index.html'));

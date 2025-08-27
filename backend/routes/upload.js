@@ -34,7 +34,7 @@ const upload = multer({
     if (extname) {
       return cb(null, true);
     } else {
-      cb(new Error('Invalid file type. Only training materials allowed.'));
+      cb(new Error('Invalid file type. Only content files allowed.'));
     }
   }
 });

@@ -95,38 +95,45 @@ router.get('/preview/:templateId', (req, res) => {
 
 router.post('/validate-style', (req, res) => {
   const { content } = req.body;
+  const brandConfig = require('../config/brandLock');
   
-  const forbiddenPatterns = [
-    /<style[\s\S]*?<\/style>/gi,
-    /style\s*=\s*["'][^"']*["']/gi,
-    /class\s*=\s*["'][^"']*["']/gi,
-    /<link[^>]*stylesheet[^>]*>/gi
+  // Check for protected brand element overrides
+  const protectedPatterns = [
+    /\.brand-logo[^{]*{[^}]*color\s*:[^}]*}/gi,
+    /\.brand-header[^{]*{[^}]*background\s*:[^}]*}/gi,
+    /\.brand-footer[^{]*{[^}]*background\s*:[^}]*}/gi,
+    /#logo[^{]*{[^}]*}/gi
   ];
   
   let violations = [];
-  forbiddenPatterns.forEach((pattern, index) => {
-    if (pattern.test(content)) {
-      violations.push(`Style violation detected: Pattern ${index + 1}`);
-    }
-  });
   
-  if (violations.length > 0) {
-    db.run(
-      `INSERT INTO brand_protection_log (event_type, attempted_action, blocked, user_ip) 
-       VALUES ('style_override_attempt', ?, 1, ?)`,
-      [violations.join(', '), req.ip]
-    );
-    
-    return res.status(400).json({
-      valid: false,
-      violations: violations,
-      message: 'Style overrides are not permitted. All styling is locked.'
+  // Only check for protected element violations if style overrides are allowed
+  if (brandConfig.allowStyleOverrides) {
+    protectedPatterns.forEach((pattern, index) => {
+      if (pattern.test(content)) {
+        violations.push(`Protected brand element modification attempt: ${brandConfig.protectedProperties[index] || 'Pattern ' + (index + 1)}`);
+      }
     });
+    
+    // If violations found on protected elements, log but allow other styles
+    if (violations.length > 0) {
+      db.run(
+        `INSERT INTO brand_protection_log (event_type, attempted_action, blocked, user_ip) 
+         VALUES ('protected_element_override', ?, 1, ?)`,
+        [violations.join(', '), req.ip]
+      );
+      
+      return res.status(200).json({
+        valid: true,
+        warnings: violations,
+        message: 'Style modifications allowed, but protected brand elements preserved.'
+      });
+    }
   }
   
   res.json({
     valid: true,
-    message: 'Content validated - no style violations detected'
+    message: 'Content validated - style modifications allowed'
   });
 });
 

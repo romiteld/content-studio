@@ -6,11 +6,15 @@ const fs = require('fs').promises;
 const path = require('path');
 
 // Initialize Gemini with native image generation support
-const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || '');
+const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_AI_API_KEY || '';
+if (!apiKey) {
+  console.warn('Warning: No Gemini/Google AI API key found. Image generation will not work.');
+}
+const genAI = new GoogleGenerativeAI(apiKey);
 
 // Get both text and image generation models
-const textModel = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
-const imageModel = genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
+const textModel = apiKey ? genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' }) : null;
+const imageModel = apiKey ? genAI.getGenerativeModel({ model: 'gemini-2.0-flash-exp' }) : null;
 
 // ============================================
 // UNIFIED MARKETING AI AGENT
