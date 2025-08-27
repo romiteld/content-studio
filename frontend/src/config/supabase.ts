@@ -1,10 +1,14 @@
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseUrl = process.env.REACT_APP_SUPABASE_URL!;
-const supabaseAnonKey = process.env.REACT_APP_SUPABASE_ANON_KEY!;
+const supabaseUrl = process.env.REACT_APP_SUPABASE_URL || '';
+const supabaseAnonKey = process.env.REACT_APP_SUPABASE_ANON_KEY || '';
 
 if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Missing Supabase environment variables');
+  console.error('Missing Supabase environment variables. Authentication will not work properly.');
+  console.error('REACT_APP_SUPABASE_URL:', supabaseUrl ? 'Set' : 'Missing');
+  console.error('REACT_APP_SUPABASE_ANON_KEY:', supabaseAnonKey ? 'Set' : 'Missing');
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey);
+export const supabase = supabaseUrl && supabaseAnonKey 
+  ? createClient(supabaseUrl, supabaseAnonKey)
+  : null as any;

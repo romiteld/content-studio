@@ -41,6 +41,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [loading, setLoading] = useState(true);
 
   const fetchProfile = async (userId: string) => {
+    if (!supabase) {
+      console.error('Supabase client not initialized');
+      return null;
+    }
+    
     try {
       const { data, error } = await supabase
         .from('user_profiles')
@@ -61,6 +66,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const signInWithOTP = async (email: string) => {
+    if (!supabase) {
+      return { error: { message: 'Authentication service not available' } as AuthError };
+    }
+    
     const { error } = await supabase.auth.signInWithOtp({
       email,
       options: {
@@ -74,6 +83,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const verifyOTP = async (email: string, token: string) => {
+    if (!supabase) {
+      return { error: { message: 'Authentication service not available' } as AuthError };
+    }
+    
     const { data, error } = await supabase.auth.verifyOtp({
       email,
       token,
@@ -90,6 +103,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const signOut = async () => {
+    if (!supabase) {
+      // Just clear local state if no supabase client
+      setUser(null);
+      setProfile(null);
+      setSession(null);
+      localStorage.removeItem('authToken');
+      sessionStorage.removeItem('authToken');
+      return { error: undefined };
+    }
+    
     const { error } = await supabase.auth.signOut();
     if (!error) {
       setUser(null);
@@ -106,13 +129,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (!user) return { error: 'No user logged in' };
 
     // Always try to save to Supabase first, fall back to localStorage if it fails
-    try {
-      // First, check if profile exists in Supabase
-      const { data: existingProfile } = await supabase
-        .from('user_profiles')
-        .select('*')
-        .eq('email', user.email || profile?.email)
-        .single();
+    if (supabase) {
+      try {
+        // First, check if profile exists in Supabase
+        const { data: existingProfile } = await supabase
+          .from('user_profiles')
+          .select('*')
+          .eq('email', user.email || profile?.email)
+          .single();
 
       if (existingProfile) {
         // Update existing profile
@@ -146,8 +170,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           return { error: undefined };
         }
       }
-    } catch (error) {
-      console.log('Supabase save failed, using localStorage:', error);
+      } catch (error) {
+        console.log('Supabase save failed, using localStorage:', error);
+      }
     }
 
     // Fallback to localStorage only
@@ -240,27 +265,28 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       return;
     }
     
-    // Get initial session from Supabase
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      
-      if (session?.user) {
-        // Store access token from existing session
-        if (session.access_token) {
-          localStorage.setItem('authToken', session.access_token);
-          sessionStorage.setItem('authToken', session.access_token);
+    // Get initial session from Supabase if client is available
+    if (supabase) {
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        setSession(session);
+        setUser(session?.user ?? null);
+        
+        if (session?.user) {
+          // Store access token from existing session
+          if (session.access_token) {
+            localStorage.setItem('authToken', session.access_token);
+            sessionStorage.setItem('authToken', session.access_token);
+          }
+          fetchProfile(session.user.id).then(setProfile);
         }
-        fetchProfile(session.user.id).then(setProfile);
-      }
-      
-      setLoading(false);
-    });
+        
+        setLoading(false);
+      });
 
-    // Listen for auth changes
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, session) => {
+      // Listen for auth changes
+      const {
+        data: { subscription },
+      } = supabase.auth.onAuthStateChange(async (event, session) => {
       setSession(session);
       setUser(session?.user ?? null);
       
@@ -283,7 +309,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setLoading(false);
     });
 
-    return () => subscription.unsubscribe();
+      return () => subscription.unsubscribe();
+    } else {
+      // No supabase client - just mark as not loading
+      setLoading(false);
+    }
   }, []);
 
   const value: AuthContextType = {
