@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import { Mail, Key, ArrowRight, AlertCircle, CheckCircle } from 'lucide-react';
 import { SplashCursor } from '../ui/splash-cursor';
-import AccessTokenInput from './AccessTokenInput';
+// import AccessTokenInput from './AccessTokenInput'; // Removed test token functionality
 import '../../styles/auth.css';
 
 interface SignInProps {
@@ -238,10 +238,10 @@ const SignIn: React.FC<SignInProps> = ({ onSuccess }) => {
           </form>
         )}
 
-        {/* Access Token Alternative - Only on email step */}
-        {step === 'email' && (
+        {/* Access Token Alternative - Removed for production */}
+        {/* {step === 'email' && (
           <AccessTokenInput onTokenSubmit={() => onSuccess?.()} />
-        )}
+        )} */}
 
         {/* Company Info */}
         <div className="auth-footer">
