@@ -1,0 +1,122 @@
+{
+  "timestamp": "2025-08-27T20:51:33.208Z",
+  "url": "https://studio.thewell.solutions",
+  "summary": {
+    "total_tests": 10,
+    "successful": 10,
+    "failed": 0,
+    "with_ai_response": 8,
+    "success_rate": "100.0%",
+    "ai_response_rate": "80.0%",
+    "avg_response_time": "6174ms"
+  },
+  "capabilities": {
+    "Chat AI (Gemini)": {
+      "total": 2,
+      "working": 2,
+      "status": "fully_operational"
+    },
+    "Marketing Analysis": {
+      "total": 2,
+      "working": 2,
+      "status": "fully_operational"
+    },
+    "Image Generation": {
+      "total": 3,
+      "working": 3,
+      "status": "fully_operational"
+    },
+    "Vision Analysis": {
+      "total": 1,
+      "working": 1,
+      "status": "fully_operational"
+    },
+    "PDF Generation": {
+      "total": 1,
+      "working": 1,
+      "status": "fully_operational"
+    },
+    "Social Optimization": {
+      "total": 2,
+      "working": 1,
+      "status": "partially_operational"
+    },
+    "Research": {
+      "total": 1,
+      "working": 0,
+      "status": "not_operational"
+    }
+  },
+  "detailed_results": [
+    {
+      "name": "🤖 AI Chat - General Conversation",
+      "success": true,
+      "has_ai_response": true,
+      "duration": 6752,
+      "status": 200
+    },
+    {
+      "name": "🎨 Image Generation - Product Photo",
+      "success": true,
+      "has_ai_response": true,
+      "duration": 1977,
+      "status": 200
+    },
+    {
+      "name": "📊 Marketing Analysis - Social Media Post",
+      "success": true,
+      "has_ai_response": true,
+      "duration": 7260,
+      "status": 200
+    },
+    {
+      "name": "👁️ Vision Analysis - Image Description",
+      "success": true,
+      "has_ai_response": true,
+      "duration": 4547,
+      "status": 200
+    },
+    {
+      "name": "📄 PDF Generation - Marketing Report",
+      "success": true,
+      "has_ai_response": true,
+      "duration": 10687,
+      "status": 200
+    },
+    {
+      "name": "🎯 Marketing Analysis - Email Campaign",
+      "success": true,
+      "has_ai_response": true,
+      "duration": 4709,
+      "status": 200
+    },
+    {
+      "name": "🖼️ Image Enhancement Prompt",
+      "success": true,
+      "has_ai_response": true,
+      "duration": 2210,
+      "status": 200
+    },
+    {
+      "name": "💬 AI Chat - Technical Question",
+      "success": true,
+      "has_ai_response": true,
+      "duration": 23266,
+      "status": 200
+    },
+    {
+      "name": "📈 Social Media Optimization",
+      "success": true,
+      "has_ai_response": false,
+      "duration": 224,
+      "status": 200
+    },
+    {
+      "name": "🔍 Research Search",
+      "success": true,
+      "has_ai_response": false,
+      "duration": 108,
+      "status": 200
+    }
+  ]
+}
