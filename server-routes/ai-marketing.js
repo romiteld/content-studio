@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const geminiMarketing = require('../api/gemini-marketing-ai');
+const geminiMarketing = require('../server-api/gemini-marketing-ai');
 
 // Campaign management
 router.post('/campaign', geminiMarketing.createCampaign);

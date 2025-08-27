@@ -3,8 +3,8 @@ const path = require('path');
 const fs = require('fs');
 
 // Load environment variables
-if (fs.existsSync(path.join(__dirname, '../.env.local'))) {
-  require('dotenv').config({ path: path.join(__dirname, '../.env.local') });
+if (fs.existsSync(path.join(__dirname, '.env.local'))) {
+  require('dotenv').config({ path: path.join(__dirname, '.env.local') });
 } else {
   require('dotenv').config();
 }

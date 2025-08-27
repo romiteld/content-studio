@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const multer = require('multer');
-const geminiVision = require('../api/gemini-vision');
+const geminiVision = require('../server-api/gemini-vision');
 
 const upload = multer({ 
   storage: multer.memoryStorage(),

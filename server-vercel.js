@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const multer = require('multer');
-const brandConfig = require('./config/brandLock');
+const brandConfig = require('./server-config/brandLock');
 const fs = require('fs');
 
 // Load environment variables
@@ -51,22 +51,22 @@ app.get('/api/health', (req, res) => {
 });
 
 // Routes
-app.use('/api/content', require('./routes/content'));
-app.use('/api/upload', require('./routes/upload'));
-app.use('/api/generate', require('./routes/generate'));
-app.use('/api/templates', require('./routes/templates'));
-app.use('/api/research', require('./routes/research'));
-app.use('/api/social', require('./routes/social'));
-app.use('/api/ai', require('./routes/ai-marketing'));
-app.use('/api/ai/image', require('./routes/ai-image'));
-app.use('/api/vision', require('./routes/vision'));
-app.use('/api/brand', require('./routes/brand'));
+app.use('/api/content', require('./server-routes/content'));
+app.use('/api/upload', require('./server-routes/upload'));
+app.use('/api/generate', require('./server-routes/generate'));
+app.use('/api/templates', require('./server-routes/templates'));
+app.use('/api/research', require('./server-routes/research'));
+app.use('/api/social', require('./server-routes/social'));
+app.use('/api/ai', require('./server-routes/ai-marketing'));
+app.use('/api/ai/image', require('./server-routes/ai-image'));
+app.use('/api/vision', require('./server-routes/vision'));
+app.use('/api/brand', require('./server-routes/brand'));
 
 // AI Agents Endpoints (These are now handled by Vercel Functions)
 // app.use('/api/agents', require('./api/ai-agents'));
 
 // Partners API
-app.use('/api/partners', require('./api/partners'));
+app.use('/api/partners', require('./server-api/partners'));
 
 // Error handling
 app.use((err, req, res, next) => {

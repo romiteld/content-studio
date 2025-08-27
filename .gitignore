@@ -14,8 +14,8 @@ dist/
 */dist/
 
 # Generated files
-backend/generated/
-backend/uploads/
+generated-backend/
+uploads-backend/
 generated/
 *.pdf
 
@@ -23,8 +23,11 @@ generated/
 *.db
 *.sqlite
 *.sqlite3
-backend/database/*.db
-backend/wealth_training.db
+database/*.db
+wealth_training.db
+
+# Backend cleanup
+backend/
 
 # Logs
 logs/

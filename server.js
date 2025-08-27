@@ -2,7 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const path = require('path');
 const multer = require('multer');
-const brandConfig = require('./config/brandLock');
+const brandConfig = require('./server-config/brandLock');
 const fs = require('fs');
 
 // Load .env.local if it exists
@@ -17,9 +17,9 @@ const PORT = process.env.PORT || 3001;
 
 app.use(cors());
 app.use(express.json());
-app.use(express.static(path.join(__dirname, '../frontend/build')));
+app.use(express.static(path.join(__dirname, 'frontend/build')));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-app.use('/brand-assets', express.static(path.join(__dirname, '../brand-assets/protected')));
+app.use('/brand-assets', express.static(path.join(__dirname, 'brand-assets/protected')));
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -55,7 +55,7 @@ app.get('/api/health', (req, res) => {
 });
 
 // Authentication Routes (MUST be first - no auth required for these)
-app.use('/api/auth', require('./routes/auth-supabase'));
+app.use('/api/auth', require('./server-routes/auth-supabase'));
 
 // Protected Routes - All routes below require authentication
 const { authenticateToken } = require('./middleware/supabase-auth');
@@ -72,29 +72,29 @@ app.use('/api/*', (req, res, next) => {
 
 // Routes (all protected by authentication)
 // Use Supabase for content management
-app.use('/api/content', require('./routes/content-supabase'));
-app.use('/api/upload', require('./routes/upload'));
-app.use('/api/generate', require('./routes/generate'));
-app.use('/api/templates', require('./routes/templates-supabase'));
-app.use('/api/research', require('./routes/research'));
-app.use('/api/social', require('./routes/social'));
-app.use('/api/ai', require('./routes/ai-marketing'));
-app.use('/api/ai/image', require('./routes/ai-image'));
-app.use('/api/vision', require('./routes/vision'));
-app.use('/api/brand', require('./routes/brand'));
+app.use('/api/content', require('./server-routes/content-supabase'));
+app.use('/api/upload', require('./server-routes/upload-supabase'));
+app.use('/api/generate', require('./server-routes/generate-supabase'));
+app.use('/api/templates', require('./server-routes/templates-supabase'));
+app.use('/api/research', require('./server-routes/research-supabase'));
+app.use('/api/social', require('./server-routes/social'));
+app.use('/api/ai', require('./server-routes/ai-marketing'));
+app.use('/api/ai/image', require('./server-routes/ai-image'));
+app.use('/api/vision', require('./server-routes/vision'));
+app.use('/api/brand', require('./server-routes/brand-supabase'));
 
 // AI Agents Endpoints
-const aiAgents = require('./api/ai-agents');
+const aiAgents = require('./server-api/ai-agents');
 app.post('/api/agents/generate', aiAgents.generateContent);
 app.post('/api/agents/weekly', aiAgents.generateWeeklyContent);
 app.post('/api/agents/visual', aiAgents.generateVisual);
 app.post('/api/agents/validate', aiAgents.validateCompliance);
 
 // Partners API (using Supabase)
-app.use('/api/partners', require('./api/partners-supabase'));
+app.use('/api/partners', require('./server-api/partners-supabase'));
 
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../frontend/build', 'index.html'));
+  res.sendFile(path.join(__dirname, 'frontend/build', 'index.html'));
 });
 
 app.listen(PORT, () => {

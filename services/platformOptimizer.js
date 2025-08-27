@@ -1,4 +1,4 @@
-const brandConfig = require('../config/brandLock');
+const brandConfig = require('../server-config/brandLock');
 
 // Platform-specific guidelines and limits
 const platformGuidelines = {

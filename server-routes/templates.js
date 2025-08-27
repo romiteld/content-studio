@@ -95,7 +95,7 @@ router.get('/preview/:templateId', (req, res) => {
 
 router.post('/validate-style', (req, res) => {
   const { content } = req.body;
-  const brandConfig = require('../config/brandLock');
+  const brandConfig = require('../server-config/brandLock');
   
   // Check for protected brand element overrides
   const protectedPatterns = [

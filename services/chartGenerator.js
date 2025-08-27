@@ -1,4 +1,4 @@
-const brandConfig = require('../config/brandLock');
+const brandConfig = require('../server-config/brandLock');
 
 // Generate SVG chart without external dependencies
 function generateSVGChart(type, data, width = 800, height = 400) {

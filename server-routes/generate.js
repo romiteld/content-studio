@@ -5,7 +5,7 @@ const PptxGenJS = require('pptxgenjs');
 const path = require('path');
 const fs = require('fs').promises;
 const sqlite3 = require('sqlite3').verbose();
-const brandConfig = require('../config/brandLock');
+const brandConfig = require('../server-config/brandLock');
 const { generateSVGChart, generateChartImage } = require('../services/chartGenerator');
 
 const db = new sqlite3.Database(path.join(__dirname, '../database/wealth_training.db'));
