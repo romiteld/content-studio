@@ -1,5 +1,3 @@
-const { GoogleGenAI } = require('@google/genai');
-
 module.exports = async (req, res) => {
   // Enable CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -26,14 +24,11 @@ module.exports = async (req, res) => {
       return res.status(400).json({ error: 'Prompt is required' });
     }
 
-    // Initialize Google GenAI client with API key
+    // Get API key
     const apiKey = process.env.GOOGLE_GENERATIVE_AI_API_KEY || process.env.GOOGLE_AI_API_KEY;
     if (!apiKey) {
       throw new Error('Google AI API key not found');
     }
-    const genAI = new GoogleGenAI({
-      apiKey: apiKey
-    });
 
     // Build enhanced prompt with brand context
     let enhancedPrompt = prompt;
@@ -45,21 +40,38 @@ module.exports = async (req, res) => {
         ${prompt}`;
     }
 
-    // Generate image using Gemini 2.5 Flash Image Preview
-    const response = await genAI.models.generateContent({
-      model: "gemini-2.5-flash-image-preview",
-      contents: enhancedPrompt,
+    // Use REST API directly for image generation
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-image-preview:generateContent?key=${apiKey}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        contents: [{
+          parts: [{
+            text: enhancedPrompt
+          }]
+        }]
+      })
     });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const result = await response.json();
 
     // Process the response
     let imageBase64 = null;
     let description = null;
 
-    for (const part of response.candidates[0].content.parts) {
-      if (part.text) {
-        description = part.text;
-      } else if (part.inlineData) {
-        imageBase64 = part.inlineData.data;
+    if (result.candidates && result.candidates[0] && result.candidates[0].content && result.candidates[0].content.parts) {
+      for (const part of result.candidates[0].content.parts) {
+        if (part.text) {
+          description = part.text;
+        } else if (part.inlineData) {
+          imageBase64 = part.inlineData.data;
+        }
       }
     }
 
@@ -105,7 +117,8 @@ module.exports = async (req, res) => {
         },
         aspectRatio: aspectRatio,
         style: style,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        debug: result
       });
     }
 
