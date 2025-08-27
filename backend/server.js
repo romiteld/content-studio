@@ -54,7 +54,23 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', brand: 'locked' });
 });
 
-// Routes
+// Authentication Routes (MUST be first - no auth required for these)
+app.use('/api/auth', require('./routes/auth-supabase'));
+
+// Protected Routes - All routes below require authentication
+const { authenticateToken } = require('./middleware/supabase-auth');
+
+// Apply authentication middleware to all API routes except /api/auth
+app.use('/api/*', (req, res, next) => {
+  // Skip auth check for auth routes and health check
+  if (req.baseUrl.startsWith('/api/auth') || req.baseUrl === '/api/health') {
+    return next();
+  }
+  // Apply authentication for all other API routes
+  authenticateToken(req, res, next);
+});
+
+// Routes (all protected by authentication)
 // Use Supabase for content management
 app.use('/api/content', require('./routes/content-supabase'));
 app.use('/api/upload', require('./routes/upload'));

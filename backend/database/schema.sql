@@ -69,6 +69,56 @@ CREATE TABLE IF NOT EXISTS brand_protection_log (
   timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+-- User authentication table
+CREATE TABLE IF NOT EXISTS users (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  email TEXT UNIQUE NOT NULL,
+  name TEXT NOT NULL,
+  password_hash TEXT NOT NULL,
+  invite_code_used TEXT NOT NULL,
+  organization TEXT,
+  role TEXT DEFAULT 'user',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  last_login TIMESTAMP,
+  is_active BOOLEAN DEFAULT 1
+);
+
+-- Invite codes table
+CREATE TABLE IF NOT EXISTS invite_codes (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  code TEXT UNIQUE NOT NULL,
+  email TEXT,
+  max_uses INTEGER DEFAULT 1,
+  used_count INTEGER DEFAULT 0,
+  expires_at TIMESTAMP,
+  created_by TEXT,
+  organization TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  is_active BOOLEAN DEFAULT 1
+);
+
+-- User sessions table
+CREATE TABLE IF NOT EXISTS sessions (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  session_token TEXT UNIQUE NOT NULL,
+  user_id INTEGER NOT NULL,
+  expires_at TIMESTAMP NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+-- Access logs table
+CREATE TABLE IF NOT EXISTS access_logs (
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  user_id INTEGER,
+  action TEXT NOT NULL,
+  resource TEXT,
+  ip_address TEXT,
+  user_agent TEXT,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
 -- Insert default locked templates
 INSERT INTO templates (name, section_type, html_structure, css_rules, is_locked) VALUES
 ('Cover Page', 'cover', '<div class="page cover-page"><div class="brand-header">{{logo}}</div><h1>{{title}}</h1></div>', 'LOCKED_CSS', 1),
