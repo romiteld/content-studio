@@ -31,7 +31,9 @@ module.exports = async (req, res) => {
     if (!apiKey) {
       throw new Error('Google AI API key not found');
     }
-    const genAI = new GoogleGenAI(apiKey);
+    const genAI = new GoogleGenAI({
+      apiKey: apiKey
+    });
 
     // Build enhanced prompt with brand context
     let enhancedPrompt = prompt;
