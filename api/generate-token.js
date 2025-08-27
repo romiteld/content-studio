@@ -79,7 +79,7 @@ module.exports = async (req, res) => {
         sub: `user-${Date.now()}`
       },
       iat: Math.floor(Date.now() / 1000),
-      iss: 'https://content-studio-theta.vercel.app'
+      iss: 'https://studio.thewell.solutions'
     };
 
     const token = jwt.sign(payload, jwtSecret, {

@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Test deployed Vercel AI agents
-URL="https://content-studio-theta.vercel.app"
+# Test deployed AI agents
+URL="https://studio.thewell.solutions"
 
 echo "🚀 Testing Deployed AI Agents on Vercel"
 echo "========================================="

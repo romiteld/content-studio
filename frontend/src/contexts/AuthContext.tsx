@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session, AuthError } from '@supabase/supabase-js';
 import { supabase } from '../config/supabase';
+import { verifySupabaseJWT, extractUserFromJWT } from '../utils/jwtVerification';
 
 interface UserProfile {
   id: string;
@@ -104,38 +105,62 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const updateProfile = async (updates: Partial<UserProfile>) => {
     if (!user) return { error: 'No user logged in' };
 
-    // Check if we're using direct JWT auth or Supabase auth
-    const isDirectAuth = user.id === 'direct-auth-user' || user.id?.startsWith('admin-') || user.id?.startsWith('user-');
-    
-    if (isDirectAuth) {
-      // For direct auth, just update the local state and localStorage
-      const updatedProfile = { 
-        ...profile, 
-        ...updates,
-        updated_at: new Date().toISOString() 
-      };
-      
-      setProfile(updatedProfile as UserProfile);
-      
-      // Save to localStorage for persistence
-      localStorage.setItem('userProfile', JSON.stringify(updatedProfile));
-      
-      return { error: undefined };
-    } else {
-      // For Supabase auth, update the database
-      const { error } = await supabase
+    // Always try to save to Supabase first, fall back to localStorage if it fails
+    try {
+      // First, check if profile exists in Supabase
+      const { data: existingProfile } = await supabase
         .from('user_profiles')
-        .update({ ...updates, updated_at: new Date().toISOString() })
-        .eq('id', user.id);
+        .select('*')
+        .eq('email', user.email || profile?.email)
+        .single();
 
-      if (!error && profile) {
-        setProfile({ ...profile, ...updates });
-        // Also save to localStorage for quick access
-        localStorage.setItem('userProfile', JSON.stringify({ ...profile, ...updates }));
+      if (existingProfile) {
+        // Update existing profile
+        const { error } = await supabase
+          .from('user_profiles')
+          .update({ ...updates, updated_at: new Date().toISOString() })
+          .eq('email', user.email || profile?.email);
+
+        if (!error) {
+          setProfile({ ...profile, ...updates } as UserProfile);
+          localStorage.setItem('userProfile', JSON.stringify({ ...profile, ...updates }));
+          return { error: undefined };
+        }
+      } else {
+        // Create new profile in Supabase
+        const newProfile = {
+          id: user.id,
+          email: user.email || profile?.email || '',
+          ...updates,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        };
+
+        const { error } = await supabase
+          .from('user_profiles')
+          .insert([newProfile]);
+
+        if (!error) {
+          setProfile(newProfile as UserProfile);
+          localStorage.setItem('userProfile', JSON.stringify(newProfile));
+          return { error: undefined };
+        }
       }
-
-      return { error };
+    } catch (error) {
+      console.log('Supabase save failed, using localStorage:', error);
     }
+
+    // Fallback to localStorage only
+    const updatedProfile = { 
+      ...profile, 
+      ...updates,
+      updated_at: new Date().toISOString() 
+    };
+    
+    setProfile(updatedProfile as UserProfile);
+    localStorage.setItem('userProfile', JSON.stringify(updatedProfile));
+    
+    return { error: undefined };
   };
 
   useEffect(() => {
@@ -143,17 +168,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const storedToken = localStorage.getItem('authToken') || sessionStorage.getItem('authToken');
     
     if (storedToken && storedToken.startsWith('eyJ')) { // JWT tokens start with eyJ
-      // Try to decode the token to get user info
-      try {
-        const payload = JSON.parse(atob(storedToken.split('.')[1]));
-        if (payload.exp && payload.exp > Date.now() / 1000) {
-          // Token is valid, create a mock user
+      // Verify the token properly using JWKS
+      verifySupabaseJWT(storedToken).then(({ valid, payload, error }) => {
+        if (valid && payload) {
+          // Extract user from verified JWT
+          const userInfo = extractUserFromJWT(payload);
+          
           setUser({
-            id: payload.sub || 'direct-auth-user',
-            email: payload.email || 'user@emailthewell.com',
-            app_metadata: payload.app_metadata || {},
-            user_metadata: payload.user_metadata || {},
-            aud: payload.aud || 'authenticated',
+            id: userInfo.id,
+            email: userInfo.email,
+            app_metadata: userInfo.app_metadata,
+            user_metadata: userInfo.user_metadata,
+            aud: 'authenticated',
             created_at: new Date().toISOString()
           } as any);
           
@@ -166,33 +192,52 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             } catch {
               // Fallback to default profile
               setProfile({
-                id: payload.sub || 'direct-auth-user',
-                email: payload.email || 'user@emailthewell.com',
-                full_name: 'Direct Auth User',
-                company_name: 'The Well',
-                role: 'authenticated',
+                id: userInfo.id,
+                email: userInfo.email,
+                full_name: userInfo.user_metadata?.full_name || 'Direct Auth User',
+                company_name: userInfo.user_metadata?.company_name || 'The Well',
+                role: userInfo.role || 'authenticated',
                 created_at: new Date().toISOString(),
                 updated_at: new Date().toISOString()
               });
             }
           } else {
-            setProfile({
-              id: payload.sub || 'direct-auth-user',
-              email: payload.email || 'user@emailthewell.com',
-              full_name: 'Direct Auth User',
-              company_name: 'The Well',
-              role: 'authenticated',
-              created_at: new Date().toISOString(),
-              updated_at: new Date().toISOString()
+            // Try to fetch profile from Supabase first
+            fetchProfile(userInfo.id).then(fetchedProfile => {
+              if (fetchedProfile) {
+                setProfile(fetchedProfile);
+                localStorage.setItem('userProfile', JSON.stringify(fetchedProfile));
+              } else {
+                // Create default profile
+                const defaultProfile = {
+                  id: userInfo.id,
+                  email: userInfo.email,
+                  full_name: userInfo.user_metadata?.full_name || 'Direct Auth User',
+                  company_name: userInfo.user_metadata?.company_name || 'The Well',
+                  role: userInfo.role || 'authenticated',
+                  created_at: new Date().toISOString(),
+                  updated_at: new Date().toISOString()
+                };
+                setProfile(defaultProfile);
+                localStorage.setItem('userProfile', JSON.stringify(defaultProfile));
+              }
             });
           }
           
           setLoading(false);
           return;
+        } else {
+          console.error('JWT verification failed:', error);
+          // Clear invalid token
+          localStorage.removeItem('authToken');
+          sessionStorage.removeItem('authToken');
         }
-      } catch (e) {
-        console.log('Invalid token format, checking Supabase session');
-      }
+      }).catch(error => {
+        console.error('Error verifying JWT:', error);
+      });
+      
+      // Don't continue to Supabase session check if we're processing a JWT
+      return;
     }
     
     // Get initial session from Supabase

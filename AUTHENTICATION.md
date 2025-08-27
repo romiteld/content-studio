@@ -10,7 +10,7 @@ The Content Studio uses a dual authentication system:
 ### For Administrators
 
 #### Method 1: Built-in Token Generator (Easiest)
-1. Navigate to https://content-studio-theta.vercel.app
+1. Navigate to https://studio.thewell.solutions
 2. Click "Use Access Token" button
 3. Enter your email in "Quick Test Token" field
 4. Click "Generate Test Token" 
@@ -70,8 +70,8 @@ User → Login Page → Generate/Enter Token → Store in Browser → Access Gra
    - Go to Supabase Dashboard → Authentication → URL Configuration
    - Add redirect URLs:
      ```
-     https://content-studio-theta.vercel.app/**
      https://studio.thewell.solutions/**
+     https://*.vercel.app/**
      ```
 
 ### Token Security

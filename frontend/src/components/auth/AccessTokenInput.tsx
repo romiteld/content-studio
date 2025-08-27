@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Shield, Key, CheckCircle, AlertCircle, Zap } from 'lucide-react';
+import { Shield, Key, CheckCircle, AlertCircle, Zap, Lock } from 'lucide-react';
 import { generateTestToken } from '../../utils/generateToken';
+import { API_BASE_URL } from '../../config/api';
 
 interface AccessTokenInputProps {
   onTokenSubmit: (token: string) => void;
@@ -32,11 +33,51 @@ const AccessTokenInput: React.FC<AccessTokenInputProps> = ({ onTokenSubmit }) =>
     onTokenSubmit(token.trim());
   };
 
-  const generateQuickToken = () => {
-    const newToken = generateTestToken(testEmail);
-    setToken(newToken);
-    setSuccess('Test token generated! Click "Authenticate with Token" to proceed.');
+  const generateQuickToken = async () => {
     setError('');
+    setSuccess('');
+    
+    // Check if email is authorized
+    const authorizedEmails = [
+      'daniel.romitelli@emailthewell.com',
+      'admin@emailthewell.com',
+      'admin@thewell.com'
+    ];
+    
+    if (!authorizedEmails.includes(testEmail.toLowerCase())) {
+      // Generate development token for non-authorized emails
+      const newToken = generateTestToken(testEmail);
+      setToken(newToken);
+      setSuccess('Development token generated! Click "Authenticate with Token" to proceed.');
+      return;
+    }
+    
+    try {
+      // Try to generate token via API for authorized emails
+      const response = await fetch(`${API_BASE_URL}/api/generate-supabase-token`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ email: testEmail })
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setToken(data.access_token);
+        setSuccess('Supabase token generated! Click "Authenticate with Token" to proceed.');
+      } else {
+        // Fallback to local generation
+        const newToken = generateTestToken(testEmail);
+        setToken(newToken);
+        setSuccess('Development token generated! Click "Authenticate with Token" to proceed.');
+      }
+    } catch (error) {
+      // Fallback to local generation if API fails
+      const newToken = generateTestToken(testEmail);
+      setToken(newToken);
+      setSuccess('Development token generated! Click "Authenticate with Token" to proceed.');
+    }
   };
 
   return (
@@ -93,15 +134,19 @@ const AccessTokenInput: React.FC<AccessTokenInputProps> = ({ onTokenSubmit }) =>
             <div className="form-group">
               <label className="form-label">
                 <Zap className="label-icon" />
-                Quick Test Token
+                Quick Access Token Generator
               </label>
               <input
                 type="email"
                 value={testEmail}
                 onChange={(e) => setTestEmail(e.target.value)}
-                placeholder="Enter email for test token"
+                placeholder="Enter email for access token"
                 className="form-input"
               />
+              <p className="form-hint" style={{ fontSize: '11px', marginTop: '4px' }}>
+                <Lock style={{ width: '10px', height: '10px', display: 'inline', marginRight: '4px' }} />
+                Authorized emails: daniel.romitelli@emailthewell.com, admin@emailthewell.com
+              </p>
             </div>
             <button
               type="button"
@@ -109,7 +154,7 @@ const AccessTokenInput: React.FC<AccessTokenInputProps> = ({ onTokenSubmit }) =>
               className="auth-button secondary"
             >
               <Zap className="button-icon" />
-              Generate Test Token
+              Generate Access Token
             </button>
           </div>
 

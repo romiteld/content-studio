@@ -7,9 +7,12 @@
 :root {
   --max-content-width: 1200px;
   --content-padding: 1.5rem;
+  --tablet-padding: 1rem;
+  --mobile-padding: 0.75rem;
+  --small-mobile-padding: 0.5rem;
 }
 
-/* Apply to ALL main containers */
+/* Apply to ALL main containers - ensure full width on mobile */
 .content-editor,
 .upload-manager,
 .generate-panel,
@@ -19,11 +22,13 @@
 .document-preview,
 .template-gallery,
 .image-studio,
-.ai-agents-panel {
-  max-width: 100%;
+.ai-agents-panel,
+.settings-panel {
+  max-width: var(--max-content-width);
   margin: 0 auto;
   width: 100%;
-  padding: 0;
+  padding: var(--content-padding);
+  box-sizing: border-box;
 }
 
 /* Ensure all section headers are centered */
@@ -110,18 +115,68 @@ form {
 
 @media (max-width: 768px) {
   :root {
-    --content-padding: 0.75rem;
+    --content-padding: var(--mobile-padding);
   }
   
   h1 { font-size: 1.75rem; }
   h2 { font-size: 1.5rem; }
   h3 { font-size: 1.25rem; }
+  
+  /* Edge-to-edge on mobile */
+  .content-editor,
+  .upload-manager,
+  .generate-panel,
+  .research-panel,
+  .social-optimizer,
+  .marketing-dashboard,
+  .document-preview,
+  .template-gallery,
+  .image-studio,
+  .ai-agents-panel,
+  .settings-panel {
+    padding-left: var(--mobile-padding);
+    padding-right: var(--mobile-padding);
+  }
 }
 
 /* Ensure preview mode respects layout */
 .preview-area {
   max-width: 600px;
   margin: 0 auto;
+}
+
+/* Add small mobile breakpoint */
+@media (max-width: 480px) {
+  :root {
+    --content-padding: var(--small-mobile-padding);
+  }
+  
+  /* Ensure edge-to-edge on small mobile */
+  .content-editor,
+  .upload-manager,
+  .generate-panel,
+  .research-panel,
+  .social-optimizer,
+  .marketing-dashboard,
+  .document-preview,
+  .template-gallery,
+  .image-studio,
+  .ai-agents-panel,
+  .settings-panel {
+    padding-left: var(--small-mobile-padding);
+    padding-right: var(--small-mobile-padding);
+  }
+  
+  /* Stack sidebar and main content vertically */
+  .editor-sidebar,
+  .editor-main {
+    width: 100%;
+    max-width: 100%;
+  }
+  
+  h1 { font-size: 1.5rem; }
+  h2 { font-size: 1.25rem; }
+  h3 { font-size: 1.1rem; }
 }
 
 /* Lock override protection */
