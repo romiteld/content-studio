@@ -104,16 +104,38 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const updateProfile = async (updates: Partial<UserProfile>) => {
     if (!user) return { error: 'No user logged in' };
 
-    const { error } = await supabase
-      .from('user_profiles')
-      .update({ ...updates, updated_at: new Date().toISOString() })
-      .eq('id', user.id);
+    // Check if we're using direct JWT auth or Supabase auth
+    const isDirectAuth = user.id === 'direct-auth-user' || user.id?.startsWith('admin-') || user.id?.startsWith('user-');
+    
+    if (isDirectAuth) {
+      // For direct auth, just update the local state and localStorage
+      const updatedProfile = { 
+        ...profile, 
+        ...updates,
+        updated_at: new Date().toISOString() 
+      };
+      
+      setProfile(updatedProfile as UserProfile);
+      
+      // Save to localStorage for persistence
+      localStorage.setItem('userProfile', JSON.stringify(updatedProfile));
+      
+      return { error: undefined };
+    } else {
+      // For Supabase auth, update the database
+      const { error } = await supabase
+        .from('user_profiles')
+        .update({ ...updates, updated_at: new Date().toISOString() })
+        .eq('id', user.id);
 
-    if (!error && profile) {
-      setProfile({ ...profile, ...updates });
+      if (!error && profile) {
+        setProfile({ ...profile, ...updates });
+        // Also save to localStorage for quick access
+        localStorage.setItem('userProfile', JSON.stringify({ ...profile, ...updates }));
+      }
+
+      return { error };
     }
-
-    return { error };
   };
 
   useEffect(() => {
@@ -128,22 +150,42 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           // Token is valid, create a mock user
           setUser({
             id: payload.sub || 'direct-auth-user',
-            email: payload.email || 'user@thewell.solutions',
+            email: payload.email || 'user@emailthewell.com',
             app_metadata: payload.app_metadata || {},
             user_metadata: payload.user_metadata || {},
             aud: payload.aud || 'authenticated',
             created_at: new Date().toISOString()
           } as any);
           
-          setProfile({
-            id: payload.sub || 'direct-auth-user',
-            email: payload.email || 'user@thewell.solutions',
-            full_name: 'Direct Auth User',
-            company_name: 'The Well',
-            role: 'authenticated',
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-          });
+          // Check if we have a saved profile in localStorage
+          const savedProfile = localStorage.getItem('userProfile');
+          if (savedProfile) {
+            try {
+              const parsedProfile = JSON.parse(savedProfile);
+              setProfile(parsedProfile);
+            } catch {
+              // Fallback to default profile
+              setProfile({
+                id: payload.sub || 'direct-auth-user',
+                email: payload.email || 'user@emailthewell.com',
+                full_name: 'Direct Auth User',
+                company_name: 'The Well',
+                role: 'authenticated',
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString()
+              });
+            }
+          } else {
+            setProfile({
+              id: payload.sub || 'direct-auth-user',
+              email: payload.email || 'user@emailthewell.com',
+              full_name: 'Direct Auth User',
+              company_name: 'The Well',
+              role: 'authenticated',
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString()
+            });
+          }
           
           setLoading(false);
           return;

@@ -43,7 +43,7 @@ export function generateTestToken(email: string): string {
 /**
  * Generate a simple access token for a given email
  * You can call this from the browser console:
- * generateAccessToken('your-email@thewell.solutions')
+ * generateAccessToken('your-email@emailthewell.com')
  */
 export function generateAccessToken(email: string): { token: string; instructions: string[] } {
   const token = generateTestToken(email);

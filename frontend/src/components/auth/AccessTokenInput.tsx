@@ -11,7 +11,7 @@ const AccessTokenInput: React.FC<AccessTokenInputProps> = ({ onTokenSubmit }) =>
   const [showTokenInput, setShowTokenInput] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  const [testEmail, setTestEmail] = useState('admin@thewell.solutions');
+  const [testEmail, setTestEmail] = useState('admin@emailthewell.com');
 
   const handleDirectToken = () => {
     if (!token.trim()) {
