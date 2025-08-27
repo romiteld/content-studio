@@ -140,18 +140,20 @@ const SignIn: React.FC<SignInProps> = ({ onSuccess }) => {
           <form onSubmit={handleSendOTP} className="auth-form">
             <div className="form-group">
               <label className="form-label">
-                <Mail className="label-icon" />
                 Email Address
               </label>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter your work email"
-                className="form-input"
-                disabled={loading}
-                required
-              />
+              <div className="input-with-icon">
+                <Mail className="input-icon" />
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="Enter your work email"
+                  className="form-input with-icon"
+                  disabled={loading}
+                  required
+                />
+              </div>
               <p className="form-hint">
                 We'll send you a secure sign-in code to access The Well Recruiting Solutions platform
               </p>

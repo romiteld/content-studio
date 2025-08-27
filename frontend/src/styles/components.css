@@ -692,17 +692,16 @@ textarea.form-control {
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  padding: 1.5rem;
+  padding: 1rem 1.25rem;
   background: rgba(20, 20, 20, 0.8);
   border: 2px solid rgba(212, 175, 55, 0.3);
   border-radius: 12px;
   color: #E6E6E6;
   cursor: pointer;
   transition: all 0.3s ease;
-  min-height: 120px;
-  min-width: 140px;
-  flex: 1;
-  max-width: 160px;
+  width: 120px;
+  height: 60px;
+  flex: none;
 }
 
 .platform-btn:hover {
@@ -738,13 +737,15 @@ textarea.form-control {
 
 .btn-optimize,
 .btn-package {
-  padding: 1rem 2rem;
+  padding: 0.75rem 1.5rem;
   border-radius: 8px;
-  font-size: 1rem;
+  font-size: 0.95rem;
   font-weight: 600;
   border: none;
   cursor: pointer;
   transition: all 0.3s ease;
+  min-width: 160px;
+  max-width: 200px;
 }
 
 .btn-optimize {
@@ -840,9 +841,9 @@ textarea.form-control {
   }
   
   .platform-btn {
-    min-width: 120px;
-    flex: 0 0 calc(50% - 0.75rem);
-    max-width: calc(50% - 0.75rem);
+    width: 110px;
+    height: 55px;
+    padding: 0.75rem 1rem;
   }
   
   .guidelines-grid {
@@ -851,11 +852,12 @@ textarea.form-control {
   
   .action-buttons {
     flex-direction: column;
+    align-items: center;
   }
   
   .btn-optimize,
   .btn-package {
-    width: 100%;
+    width: 180px;
   }
 }
 
@@ -865,9 +867,10 @@ textarea.form-control {
   }
   
   .platform-btn {
-    min-width: 100px;
-    padding: 1rem;
-    font-size: 0.9rem;
+    width: 100px;
+    height: 50px;
+    padding: 0.5rem;
+    font-size: 0.85rem;
   }
   
   .platform-icon {

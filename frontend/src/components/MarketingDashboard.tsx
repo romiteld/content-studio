@@ -111,7 +111,11 @@ interface CampaignBrief {
   kpis: string[];
 }
 
-export default function MarketingDashboard() {
+interface MarketingDashboardProps {
+  previewMode?: boolean;
+}
+
+export default function MarketingDashboard({ previewMode = false }: MarketingDashboardProps) {
   const [selectedChannels, setSelectedChannels] = useState<string[]>([]);
   const [campaignBrief, setCampaignBrief] = useState<CampaignBrief>({
     name: '',
@@ -192,7 +196,7 @@ export default function MarketingDashboard() {
           </h1>
         </div>
         
-        <nav className="dashboard-nav">
+        <nav className={`dashboard-nav ${previewMode ? 'preview-active' : ''}`}>
           <button 
             className={`nav-button ${activeView === 'dashboard' ? 'active' : ''}`}
             onClick={() => setActiveView('dashboard')}
@@ -521,7 +525,7 @@ export default function MarketingDashboard() {
 
       {/* AI Assistant Panel */}
       <aside className="ai-assistant">
-        <div className="assistant-header">
+        <div className="assistant-header" style={{ display: 'none' }}>
           <Sparkles />
           <h3>AI Marketing Assistant</h3>
         </div>

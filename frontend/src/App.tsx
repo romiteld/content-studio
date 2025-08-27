@@ -22,6 +22,7 @@ import ResearchPanel from './components/ResearchPanel';
 import SocialMediaOptimizer from './components/SocialMediaOptimizer';
 import MarketingDashboard from './components/MarketingDashboard';
 import Settings from './components/Settings';
+import AIChatAssistant from './components/AIChatAssistant';
 
 interface ContentItem {
   id: number;
@@ -147,7 +148,7 @@ function AppContent() {
     }
   };
 
-  // Keyboard shortcuts: Ctrl/Cmd+S to save, P to toggle preview, 1-5 to switch tabs
+  // Only keep the save shortcut (Ctrl/Cmd+S)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       const isMac = navigator.platform.toUpperCase().includes('MAC');
@@ -156,25 +157,6 @@ function AppContent() {
         e.preventDefault();
         window.dispatchEvent(new CustomEvent('app:save'));
         return;
-      }
-      if (!e.ctrlKey && !e.metaKey && !e.altKey) {
-        if (e.key.toLowerCase() === 'p') {
-          setPreviewMode((v) => !v);
-          return;
-        }
-        const tabKeys: Record<string, typeof activeTab> = {
-          '1': 'editor',
-          '2': 'upload',
-          '3': 'generate',
-          '4': 'research',
-          '5': 'social',
-          '6': 'marketing',
-          '7': 'settings',
-        };
-        if (tabKeys[e.key]) {
-          setActiveTab(tabKeys[e.key]);
-          return;
-        }
       }
     };
     window.addEventListener('keydown', handleKeyDown);
@@ -195,56 +177,48 @@ function AppContent() {
           <button 
             className={`nav-tab will-change-transform ${activeTab === 'editor' ? 'active' : ''}`}
             onClick={() => setActiveTab('editor')}
-            data-tooltip="Press 1"
           >
             Content Editor
           </button>
           <button 
             className={`nav-tab will-change-transform ${activeTab === 'upload' ? 'active' : ''}`}
             onClick={() => setActiveTab('upload')}
-            data-tooltip="Press 2"
           >
             Upload Materials
           </button>
           <button 
             className={`nav-tab will-change-transform ${activeTab === 'generate' ? 'active' : ''}`}
             onClick={() => setActiveTab('generate')}
-            data-tooltip="Press 3"
           >
             Generate Documents
           </button>
           <button 
             className={`nav-tab will-change-transform ${activeTab === 'research' ? 'active' : ''}`}
             onClick={() => setActiveTab('research')}
-            data-tooltip="Press 4"
           >
             Research
           </button>
           <button 
             className={`nav-tab will-change-transform ${activeTab === 'social' ? 'active' : ''}`}
             onClick={() => setActiveTab('social')}
-            data-tooltip="Press 5"
           >
             Social Media
           </button>
           <button 
             className={`nav-tab will-change-transform ${activeTab === 'marketing' ? 'active' : ''}`}
             onClick={() => setActiveTab('marketing')}
-            data-tooltip="Press 6"
           >
             AI Marketing Hub
           </button>
           <button 
             className={`nav-tab will-change-transform ${activeTab === 'settings' ? 'active' : ''}`}
             onClick={() => setActiveTab('settings')}
-            data-tooltip="Press 7"
           >
             Settings
           </button>
           <button 
             className={`nav-tab preview-toggle will-change-transform ${previewMode ? 'active' : ''}`}
             onClick={() => setPreviewMode(!previewMode)}
-            data-tooltip="Press P"
           >
             {previewMode ? 'Hide Preview' : 'Show Preview'}
           </button>
@@ -269,7 +243,7 @@ function AppContent() {
             <Route path="/generate" element={<GeneratePanel contentItems={contentItems} />} />
             <Route path="/research" element={<ResearchPanel onContentAdded={fetchContent} />} />
             <Route path="/social" element={<SocialMediaOptimizer contentItems={contentItems} />} />
-            <Route path="/marketing" element={<MarketingDashboard />} />
+            <Route path="/marketing" element={<MarketingDashboard previewMode={previewMode} />} />
             <Route path="/settings" element={<Settings />} />
             <Route path="*" element={<Navigate to="/editor" replace />} />
           </Routes>
@@ -287,6 +261,9 @@ function AppContent() {
           ⚠️ Brand Design System: LOCKED | Style Modifications: DISABLED | © The Well 2025
         </div>
       </footer>
+
+      {/* AI Chat Assistant - Available on all pages */}
+      <AIChatAssistant />
     </div>
   );
 }

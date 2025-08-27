@@ -3,6 +3,10 @@
 .env.local.backend
 .env
 .env.*.local
+.env.production
+*/.env.production
+backend/.env.production
+frontend/.env.production
 
 # Dependencies
 node_modules/
@@ -15,15 +19,20 @@ dist/
 */dist/
 
 # Generated files
-generated-backend/
-uploads-backend/
-generated/
 *.pdf
+*.pptx
+!docs/*.pdf
+!docs/*.html
 
 # Database - using Supabase cloud (no local database files)
 
-# Backend cleanup
-backend/
+# Backend specific ignores
+backend/node_modules/
+backend/generated/*.pdf
+backend/generated/*.pptx
+backend/uploads/*
+backend/.env.local
+backend/*.log
 
 # Logs
 logs/

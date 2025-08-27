@@ -4,15 +4,17 @@
   background: #1a1a1a;
   color: #ffffff;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  display: flex;
+  flex-direction: column;
 }
 
 /* Dashboard Header */
 .dashboard-header {
   background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
-  padding: 2rem;
+  padding: 1.5rem 2rem;
   border-bottom: 1px solid rgba(212, 175, 55, 0.2);
-  margin-bottom: 2rem;
   position: relative;
+  flex-shrink: 0;
 }
 
 .header-content {
@@ -26,7 +28,7 @@
   align-items: center;
   justify-content: center;
   gap: 1rem;
-  font-size: 2.5rem;
+  font-size: 2rem;
   font-weight: 700;
   color: #D4AF37;
   margin: 0 auto 0.5rem auto;
@@ -42,7 +44,7 @@
 
 .dashboard-subtitle {
   color: rgba(255, 255, 255, 0.7);
-  font-size: 1.1rem;
+  font-size: 1rem;
   margin: 0;
   text-align: center;
 }
@@ -52,7 +54,7 @@
   background: rgba(0, 0, 0, 0.5);
   padding: 1rem 2rem;
   display: flex;
-  justify-content: flex-start;
+  justify-content: center;
   gap: 0.75rem;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   overflow-x: auto;
@@ -60,6 +62,13 @@
   -webkit-overflow-scrolling: touch;
   scrollbar-width: thin;
   scrollbar-color: rgba(212, 175, 55, 0.3) transparent;
+  transition: justify-content 0.3s ease;
+  flex-shrink: 0;
+}
+
+/* When preview is active, shift navigation to the left */
+.dashboard-nav.preview-active {
+  justify-content: flex-start;
 }
 
 .dashboard-nav::-webkit-scrollbar {
@@ -114,12 +123,18 @@
   padding: 2rem;
   max-width: 1400px;
   margin: 0 auto;
+  width: 100%;
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  min-height: 0; /* Allow flex item to shrink */
 }
 
 .dashboard-grid {
   display: flex;
   flex-direction: column;
   gap: 2rem;
+  padding-bottom: 2rem;
 }
 
 /* Metrics Section */
@@ -127,7 +142,8 @@
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 12px;
-  padding: 1.5rem;
+  padding: 2rem;
+  margin-bottom: 2rem;
 }
 
 .metrics-section h2 {
@@ -201,7 +217,8 @@
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 12px;
-  padding: 1.5rem;
+  padding: 2rem;
+  margin-bottom: 2rem;
 }
 
 .channels-section h2 {
@@ -292,7 +309,8 @@
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 12px;
-  padding: 1.5rem;
+  padding: 2rem;
+  margin-bottom: 2rem;
 }
 
 .campaigns-section h2 {
@@ -670,16 +688,7 @@
 
 /* AI Assistant Panel */
 .ai-assistant {
-  position: fixed;
-  right: 2rem;
-  bottom: 2rem;
-  width: 350px;
-  max-height: 500px;
-  background: rgba(0, 0, 0, 0.95);
-  border: 1px solid rgba(212, 175, 55, 0.3);
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+  display: none; /* Hide the assistant panel since we have the chat widget */
 }
 
 .assistant-header {
@@ -777,12 +786,8 @@
 
 /* Responsive Design */
 @media (max-width: 1200px) {
-  .marketing-dashboard {
-    padding: 1rem;
-  }
-  
   .dashboard-main {
-    padding: 1rem;
+    padding: 1.5rem;
   }
   
   .ai-assistant {

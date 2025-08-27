@@ -234,21 +234,6 @@ const SocialMediaOptimizer: React.FC<SocialMediaOptimizerProps> = ({ contentItem
         </div>
 
         <div className="platform-selection">
-          <h3>2. Select Platform</h3>
-          <div className="platform-grid">
-            {platforms.map((platform) => {
-              return (
-                <button
-                  key={platform.id}
-                  className={`platform-btn ${selectedPlatform === platform.id ? 'selected' : ''}`}
-                  onClick={() => setSelectedPlatform(platform.id)}
-                  style={{ borderColor: selectedPlatform === platform.id ? platform.color : 'transparent' }}
-                >
-                  <span className="platform-name">{platform.name}</span>
-                </button>
-              );
-            })}
-          </div>
           <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'center' }}>
             <WealthIntegrationsOrbit />
           </div>
@@ -256,7 +241,7 @@ const SocialMediaOptimizer: React.FC<SocialMediaOptimizerProps> = ({ contentItem
 
         {activeTab === 'optimize' && (
           <div className="optimization-actions">
-            <h3>3. Optimize Content</h3>
+            <h3>2. Optimize Content</h3>
             <div className="action-buttons">
               <button 
                 className="btn-optimize"
@@ -293,10 +278,9 @@ const SocialMediaOptimizer: React.FC<SocialMediaOptimizerProps> = ({ contentItem
 
         {activeTab === 'schedule' && (
           <div className="schedule-section">
-            <h3>3. Schedule Posts</h3>
+            <h3>2. Schedule Posts</h3>
             
             <div className="platform-connections">
-              <h4>Platform Connections</h4>
               <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '20px' }}>
                 <WealthIntegrationsOrbit />
               </div>

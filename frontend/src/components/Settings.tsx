@@ -180,11 +180,6 @@ const Settings: React.FC = () => {
             <h1 className="settings-title">Settings</h1>
             <p className="settings-subtitle">Manage your account and preferences</p>
           </div>
-          <div className="header-actions">
-            <button className="btn-icon-primary" title="Help">
-              <AlertCircle className="icon-sm" />
-            </button>
-          </div>
         </div>
       </div>
 
@@ -469,7 +464,14 @@ const Settings: React.FC = () => {
                     <p>Get notified about new features and updates</p>
                   </div>
                   <label className="toggle-switch">
-                    <input type="checkbox" defaultChecked />
+                    <input 
+                      type="checkbox" 
+                      defaultChecked
+                      onChange={(e) => {
+                        const prefs = { marketingUpdates: e.target.checked };
+                        localStorage.setItem('marketingPreferences', JSON.stringify(prefs));
+                      }}
+                    />
                     <span className="toggle-slider"></span>
                   </label>
                 </div>

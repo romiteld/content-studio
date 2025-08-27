@@ -4,11 +4,13 @@
   "description": "The Well Recruiting Solutions Content Studio",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "nodemon server.js",
+    "backend": "cd backend && npm start",
+    "backend:dev": "cd backend && npm run dev",
     "frontend": "cd frontend && npm start",
     "frontend:build": "cd frontend && npm run build",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install",
+    "dev": "echo 'Run npm run backend in one terminal and npm run frontend in another'",
+    "test": "cd tests && npm test"
   },
   "keywords": [],
   "author": "",

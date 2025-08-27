@@ -150,6 +150,8 @@
   background: #111827;
   transition: all 0.2s ease;
   font-family: inherit;
+  position: relative;
+  z-index: 1;
 }
 
 .form-input:focus {
@@ -178,6 +180,31 @@
   margin-top: 6px;
   margin-bottom: 0;
   line-height: 1.4;
+}
+
+/* Input with icon */
+.input-with-icon {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-icon {
+  position: absolute;
+  left: 16px;
+  width: 20px;
+  height: 20px;
+  color: #9ca3af;
+  pointer-events: none;
+  z-index: 0; /* Lower z-index so it doesn't block input */
+}
+
+.form-input.with-icon {
+  padding-left: 48px;
+}
+
+.input-with-icon:focus-within .input-icon {
+  color: #D4AF37;
 }
 
 /* Buttons */

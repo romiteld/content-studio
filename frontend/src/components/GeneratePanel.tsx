@@ -11,6 +11,11 @@ const GeneratePanel: React.FC<GeneratePanelProps> = ({ contentItems }) => {
   const [documentTitle, setDocumentTitle] = useState('');
   const [generating, setGenerating] = useState(false);
   const [downloadLink, setDownloadLink] = useState<string | null>(null);
+  const [brandingOptions, setBrandingOptions] = useState({
+    includeWatermark: true,
+    includeLogo: true,
+    includeFooter: true
+  });
   const { showToast } = useToast();
 
   const handleItemToggle = (id: number) => {
@@ -48,6 +53,7 @@ const GeneratePanel: React.FC<GeneratePanelProps> = ({ contentItems }) => {
         body: JSON.stringify({
           title: documentTitle || 'Content Document',
           contentIds: selectedItems,
+          branding: brandingOptions
         }),
       });
       setDownloadLink(`${API_BASE_URL}${result.path}`);
@@ -73,6 +79,45 @@ const GeneratePanel: React.FC<GeneratePanelProps> = ({ contentItems }) => {
             onChange={(e) => setDocumentTitle(e.target.value)}
             placeholder="Enter document title..."
           />
+        </div>
+        
+        <div className="branding-options">
+          <h3>Branding Options</h3>
+          <div className="branding-controls">
+            <label className="checkbox-option">
+              <input
+                type="checkbox"
+                checked={brandingOptions.includeWatermark}
+                onChange={(e) => setBrandingOptions({
+                  ...brandingOptions,
+                  includeWatermark: e.target.checked
+                })}
+              />
+              <span>Include Watermark</span>
+            </label>
+            <label className="checkbox-option">
+              <input
+                type="checkbox"
+                checked={brandingOptions.includeLogo}
+                onChange={(e) => setBrandingOptions({
+                  ...brandingOptions,
+                  includeLogo: e.target.checked
+                })}
+              />
+              <span>Include Logo</span>
+            </label>
+            <label className="checkbox-option">
+              <input
+                type="checkbox"
+                checked={brandingOptions.includeFooter}
+                onChange={(e) => setBrandingOptions({
+                  ...brandingOptions,
+                  includeFooter: e.target.checked
+                })}
+              />
+              <span>Include Footer</span>
+            </label>
+          </div>
         </div>
       </div>
 

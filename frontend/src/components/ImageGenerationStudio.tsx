@@ -115,9 +115,15 @@ export default function ImageGenerationStudio() {
 
     setIsGenerating(true);
     try {
+      // Get auth token
+      const token = localStorage.getItem('auth_token');
+      
       const response = await fetch('http://localhost:3001/api/ai/generate-image', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': token ? `Bearer ${token}` : ''
+        },
         body: JSON.stringify({
           prompt: concept,
           specifications: {
