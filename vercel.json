@@ -1,8 +1,8 @@
 {
   "version": 2,
   "name": "wealth-management-platform",
-  "buildCommand": "cd frontend && npm install && npm run build",
-  "outputDirectory": "frontend/build",
+  "buildCommand": "cd backend/frontend && npm install && npm run build",
+  "outputDirectory": "backend/frontend/build",
   "framework": "create-react-app",
   "functions": {
     "api/agents/*.js": {
