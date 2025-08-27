@@ -1,0 +1,80 @@
+/* Wealth Integrations Orbit Animations */
+
+@keyframes orbitRotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes iconFloat {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-4px);
+  }
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    opacity: 0.3;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: scale(1.05);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Apply animations to orbit icons */
+.orbit-icon {
+  animation: iconFloat 3s ease-in-out infinite;
+  will-change: transform;
+}
+
+.orbit-icon:hover {
+  animation-play-state: paused;
+}
+
+/* Staggered animation delays for smooth appearance */
+.orbit-icon:nth-child(1) { animation-delay: 0s; }
+.orbit-icon:nth-child(2) { animation-delay: 0.2s; }
+.orbit-icon:nth-child(3) { animation-delay: 0.4s; }
+.orbit-icon:nth-child(4) { animation-delay: 0.6s; }
+.orbit-icon:nth-child(5) { animation-delay: 0.8s; }
+.orbit-icon:nth-child(6) { animation-delay: 1s; }
+.orbit-icon:nth-child(7) { animation-delay: 1.2s; }
+.orbit-icon:nth-child(8) { animation-delay: 1.4s; }
+.orbit-icon:nth-child(9) { animation-delay: 1.6s; }
+
+/* Enhanced glow effects */
+.orbit-glow {
+  animation: pulseGlow 4s ease-in-out infinite;
+}
+
+/* Smooth appearance animation */
+.orbit-container {
+  animation: fadeInUp 0.8s ease-out;
+}
+
+/* Hardware acceleration for better performance */
+.orbit-icon,
+.orbit-glow,
+.orbit-container {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}

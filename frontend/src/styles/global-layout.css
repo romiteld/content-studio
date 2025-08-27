@@ -1,0 +1,132 @@
+/* ========================================
+   GLOBAL LAYOUT SYSTEM
+   Consistent centering across all pages
+   ======================================== */
+
+/* Global Container Width */
+:root {
+  --max-content-width: 1200px;
+  --content-padding: 1.5rem;
+}
+
+/* Apply to ALL main containers */
+.content-editor,
+.upload-manager,
+.generate-panel,
+.research-panel,
+.social-optimizer,
+.marketing-dashboard,
+.document-preview,
+.template-gallery,
+.image-studio,
+.ai-agents-panel {
+  max-width: 100%;
+  margin: 0 auto;
+  width: 100%;
+  padding: 0;
+}
+
+/* Ensure all section headers are centered */
+h1, h2, h3 {
+  text-align: center;
+  width: 100%;
+}
+
+/* Main sections alignment */
+.editor-main h2,
+.upload-section h2,
+.generate-section h2,
+.research-section h2,
+.social-section h2,
+.marketing-section h2 {
+  color: #D4AF37;
+  text-align: center;
+  font-size: 1.75rem;
+  font-weight: 600;
+  letter-spacing: 1px;
+  margin-bottom: 2rem;
+}
+
+/* Ensure consistent spacing */
+.content-section,
+.upload-zone,
+.generate-form,
+.research-form,
+.social-form,
+.marketing-panel {
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* Grid layouts centered */
+.dashboard-grid,
+.campaign-grid,
+.content-grid,
+.template-grid {
+  max-width: 1400px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* Form containers */
+form {
+  max-width: 800px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* Card layouts */
+.card-container,
+.role-card,
+.content-card,
+.upload-card {
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* Footer alignment */
+.app-footer {
+  max-width: var(--max-content-width);
+  margin: 0 auto;
+  width: 100%;
+  padding: 0 var(--content-padding);
+}
+
+/* Responsive adjustments */
+@media (max-width: 1680px) {
+  :root {
+    --max-content-width: 100%;
+    --content-padding: 1.5rem;
+  }
+}
+
+@media (max-width: 1200px) {
+  :root {
+    --content-padding: 1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  :root {
+    --content-padding: 0.75rem;
+  }
+  
+  h1 { font-size: 1.75rem; }
+  h2 { font-size: 1.5rem; }
+  h3 { font-size: 1.25rem; }
+}
+
+/* Ensure preview mode respects layout */
+.preview-area {
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* Lock override protection */
+.brand-locked-scope * {
+  max-width: inherit !important;
+  margin-left: inherit !important;
+  margin-right: inherit !important;
+}
