@@ -1,70 +1,99 @@
-// Vercel Serverless Function for Compliance Validation
-const { GoogleGenerativeAI } = require('@google/generative-ai');
+import { google } from '@ai-sdk/google';
+import { generateText } from 'ai';
 
-const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY);
+export const config = {
+  runtime: 'edge',
+  maxDuration: 30,
+};
 
-// Compliance Validation Agent
-class ComplianceAgent {
-  constructor() {
-    this.model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
-  }
-
-  async validateCompliance(content, contentType) {
-    const prompt = `As a compliance expert for wealth management content, validate the following ${contentType} content:
-
-    "${content}"
-
-    Check for:
-    1. Regulatory compliance (FINRA, SEC standards)
-    2. Prohibited terms or guarantees
-    3. Misleading claims
-    4. Required disclaimers
-    5. Brand compliance (The Well standards)
-
-    Provide:
-    - Compliance status (Approved/Needs Corrections/Rejected)
-    - Specific issues found
-    - Required corrections
-    - Suggested improvements`;
-
-    const result = await this.model.generateContent(prompt);
-    const response = await result.response;
-    return response.text();
-  }
-}
-
-// Vercel Serverless Function Handler
-module.exports = async (req, res) => {
-  // Enable CORS
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+export default async function handler(req) {
+  const headers = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type',
+  };
 
   if (req.method === 'OPTIONS') {
-    return res.status(200).end();
+    return new Response(null, { status: 200, headers });
   }
 
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
+    return new Response(JSON.stringify({ error: 'Method not allowed' }), {
+      status: 405,
+      headers: { ...headers, 'Content-Type': 'application/json' },
+    });
   }
-
-  const { content, type = 'marketing' } = req.body;
-
-  if (!content) {
-    return res.status(400).json({ error: 'Content is required for validation' });
-  }
-
-  const agent = new ComplianceAgent();
 
   try {
-    const validation = await agent.validateCompliance(content, type);
-    res.status(200).json({ 
+    const { content, type = 'marketing' } = await req.json();
+
+    if (!content) {
+      return new Response(JSON.stringify({ error: 'Content is required for validation' }), {
+        status: 400,
+        headers: { ...headers, 'Content-Type': 'application/json' },
+      });
+    }
+
+    const prompt = `As a compliance expert for wealth management content, validate the following ${type} content:
+
+"${content}"
+
+Check for:
+1. Regulatory compliance (FINRA, SEC standards)
+2. Prohibited terms or guarantees
+3. Misleading claims
+4. Required disclaimers
+5. Brand compliance (The Well standards)
+
+Provide response in this JSON format:
+{
+  "status": "Approved" | "Needs Corrections" | "Rejected",
+  "score": 1-10,
+  "issues": ["list of specific issues found"],
+  "corrections": ["list of required corrections"],
+  "improvements": ["list of suggested improvements"],
+  "summary": "brief summary of validation"
+}`;
+
+    const result = await generateText({
+      model: google('gemini-2.0-flash-exp'),
+      prompt,
+      temperature: 0.2,
+      maxTokens: 1500,
+    });
+
+    // Parse the response to ensure it's valid JSON
+    let validation;
+    try {
+      const jsonMatch = result.text.match(/```json\n?([\s\S]*?)\n?```/);
+      const jsonText = jsonMatch ? jsonMatch[1] : result.text;
+      validation = JSON.parse(jsonText);
+    } catch (parseError) {
+      // Fallback to text response if JSON parsing fails
+      validation = {
+        status: "Needs Review",
+        score: 5,
+        issues: [],
+        corrections: [],
+        improvements: [],
+        summary: result.text
+      };
+    }
+
+    return new Response(JSON.stringify({ 
       success: true, 
       validation,
       timestamp: new Date().toISOString()
+    }), {
+      status: 200,
+      headers: { ...headers, 'Content-Type': 'application/json' },
     });
+    
   } catch (error) {
     console.error('Compliance validation error:', error);
-    res.status(500).json({ error: error.message });
+    return new Response(JSON.stringify({ error: error.message }), {
+      status: 500,
+      headers: { ...headers, 'Content-Type': 'application/json' },
+    });
   }
-};
+}

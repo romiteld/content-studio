@@ -1,99 +1,87 @@
-// Vercel Serverless Function for AI Agents Content Generation
-const { GoogleGenerativeAI } = require('@google/generative-ai');
+import { google } from '@ai-sdk/google';
+import { streamText } from 'ai';
 
-// Initialize Gemini AI
-const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY);
+export const config = {
+  runtime: 'edge',
+  maxDuration: 30,
+};
 
-// Content Generation Workflow
-class ContentGenerationWorkflow {
-  constructor() {
-    this.model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
-  }
-
-  async generateTalentTicker(date) {
-    const prompt = `Generate a LinkedIn Talent Ticker update for wealth management recruitment trends for ${date}. Include:
-    1. 3 trending up metrics with percentages
-    2. 2 trending down areas
-    3. A partner firm spotlight with specific role
-    4. Actionable insights for firms and talent
-    
-    Format as professional LinkedIn content with emojis and hashtags.`;
-
-    const result = await this.model.generateContent(prompt);
-    const response = await result.response;
-    return { 
-      content: response.text(),
-      type: 'talent_ticker',
-      date: date
-    };
-  }
-
-  async generatePartnerSpotlight(firmName, firmData) {
-    const prompt = `Create a partner firm spotlight for ${firmName}. 
-    Data: ${JSON.stringify(firmData)}
-    Include their specialization, recent achievements, and why talent should consider them.`;
-
-    const result = await this.model.generateContent(prompt);
-    const response = await result.response;
-    return { 
-      content: response.text(),
-      type: 'partner_spotlight',
-      firmName
-    };
-  }
-
-  async generateCareerGuide(topic, audience) {
-    const prompt = `Create a comprehensive career guide on "${topic}" for ${audience} in wealth management.
-    Include actionable steps, industry insights, and practical tips.`;
-
-    const result = await this.model.generateContent(prompt);
-    const response = await result.response;
-    return { 
-      content: response.text(),
-      type: 'career_guide',
-      topic,
-      audience
-    };
-  }
-}
-
-// Vercel Serverless Function Handler
-module.exports = async (req, res) => {
+export default async function handler(req) {
   // Enable CORS
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  const headers = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type',
+  };
 
   if (req.method === 'OPTIONS') {
-    return res.status(200).end();
+    return new Response(null, { status: 200, headers });
   }
 
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
+    return new Response(JSON.stringify({ error: 'Method not allowed' }), {
+      status: 405,
+      headers: { ...headers, 'Content-Type': 'application/json' },
+    });
   }
-
-  const { type, params } = req.body;
-  const workflow = new ContentGenerationWorkflow();
 
   try {
-    let result;
+    const { type, params } = await req.json();
+
+    let prompt = '';
+    
     switch(type) {
       case 'talent_ticker':
-        result = await workflow.generateTalentTicker(new Date(params.date || Date.now()));
+        const date = params.date || new Date().toISOString();
+        prompt = `Generate a LinkedIn Talent Ticker update for wealth management recruitment trends for ${date}. Include:
+        1. 3 trending up metrics with percentages
+        2. 2 trending down areas
+        3. A partner firm spotlight with specific role
+        4. Actionable insights for firms and talent
+        
+        Format as professional LinkedIn content with emojis and hashtags.`;
         break;
+        
       case 'partner_spotlight':
-        result = await workflow.generatePartnerSpotlight(params.firmName, params.firmData);
+        prompt = `Create a partner firm spotlight for ${params.firmName}. 
+        Data: ${JSON.stringify(params.firmData || {})}
+        Include their specialization, recent achievements, and why talent should consider them.`;
         break;
+        
       case 'career_guide':
-        result = await workflow.generateCareerGuide(params.topic, params.audience);
+        prompt = `Create a comprehensive career guide on "${params.topic}" for ${params.audience} in wealth management.
+        Include actionable steps, industry insights, and practical tips.`;
         break;
+        
       default:
-        return res.status(400).json({ error: `Unknown content type: ${type}` });
+        return new Response(JSON.stringify({ error: `Unknown content type: ${type}` }), {
+          status: 400,
+          headers: { ...headers, 'Content-Type': 'application/json' },
+        });
     }
+
+    const result = await streamText({
+      model: google('gemini-2.0-flash-exp'),
+      prompt,
+      temperature: 0.7,
+      maxTokens: 2000,
+    });
+
+    // Return streaming response
+    return new Response(result.toDataStreamResponse().body, {
+      headers: {
+        ...headers,
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache',
+        'Connection': 'keep-alive',
+      },
+    });
     
-    res.status(200).json({ success: true, content: result });
   } catch (error) {
     console.error('Content generation error:', error);
-    res.status(500).json({ error: error.message });
+    return new Response(JSON.stringify({ error: error.message }), {
+      status: 500,
+      headers: { ...headers, 'Content-Type': 'application/json' },
+    });
   }
-};
+}

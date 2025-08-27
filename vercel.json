@@ -5,8 +5,8 @@
   "framework": "create-react-app",
   "functions": {
     "api/agents/*.js": {
-      "maxDuration": 30,
-      "memory": 1024
+      "runtime": "edge",
+      "maxDuration": 30
     },
     "api/backend.js": {
       "maxDuration": 30,

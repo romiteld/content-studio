@@ -1,104 +1,164 @@
-// Vercel Serverless Function for Weekly Content Calendar
-const { GoogleGenerativeAI } = require('@google/generative-ai');
+import { google } from '@ai-sdk/google';
+import { generateText, streamText } from 'ai';
 
-const genAI = new GoogleGenerativeAI(process.env.GOOGLE_AI_API_KEY);
+export const config = {
+  runtime: 'edge',
+  maxDuration: 30,
+};
 
-// Weekly Content Calendar Agent
-class WeeklyContentAgent {
-  constructor() {
-    this.model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-exp" });
-  }
-
-  async generateWeeklyCalendar(startDate, theme) {
-    const prompt = `Create a weekly content calendar for wealth management recruitment starting ${startDate}.
-    Theme: ${theme || 'General wealth management trends'}
-    
-    For each day (Monday-Friday), provide:
-    1. Content type (LinkedIn post, blog, infographic, etc.)
-    2. Topic/Title
-    3. Key message
-    4. Optimal posting time
-    5. Hashtags
-    6. Call to action
-    
-    Ensure variety and engagement across the week.`;
-
-    const result = await this.model.generateContent(prompt);
-    const response = await result.response;
-    
-    return {
-      week: startDate,
-      theme: theme || 'General wealth management trends',
-      calendar: response.text()
-    };
-  }
-
-  async generateBatchContent(topics) {
-    const results = [];
-    
-    for (const topic of topics) {
-      const prompt = `Create a short, engaging LinkedIn post about: ${topic}
-      For wealth management professionals and firms.
-      Include relevant hashtags and a call to action.`;
-      
-      const result = await this.model.generateContent(prompt);
-      const response = await result.response;
-      
-      results.push({
-        topic,
-        content: response.text(),
-        generated: new Date().toISOString()
-      });
-    }
-    
-    return results;
-  }
-}
-
-// Vercel Serverless Function Handler
-module.exports = async (req, res) => {
-  // Enable CORS
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+export default async function handler(req) {
+  const headers = {
+    'Access-Control-Allow-Origin': '*',
+    'Access-Control-Allow-Methods': 'POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type',
+  };
 
   if (req.method === 'OPTIONS') {
-    return res.status(200).end();
+    return new Response(null, { status: 200, headers });
   }
 
   if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
+    return new Response(JSON.stringify({ error: 'Method not allowed' }), {
+      status: 405,
+      headers: { ...headers, 'Content-Type': 'application/json' },
+    });
   }
-
-  const { action, params = {} } = req.body;
-  const agent = new WeeklyContentAgent();
 
   try {
-    let result;
+    const { action, params = {} } = await req.json();
+    
     switch(action) {
-      case 'calendar':
-        result = await agent.generateWeeklyCalendar(
-          params.startDate || new Date().toISOString(),
-          params.theme
-        );
-        break;
-      case 'batch':
-        if (!params.topics || !Array.isArray(params.topics)) {
-          return res.status(400).json({ error: 'Topics array is required for batch generation' });
+      case 'calendar': {
+        const startDate = params.startDate || new Date().toISOString();
+        const theme = params.theme || 'General wealth management trends';
+        
+        const prompt = `Create a weekly content calendar for wealth management recruitment starting ${startDate}.
+        Theme: ${theme}
+        
+        Return a JSON object with this structure:
+        {
+          "week": "${startDate}",
+          "theme": "${theme}",
+          "days": {
+            "monday": {
+              "type": "content type",
+              "title": "content title",
+              "message": "key message",
+              "time": "posting time",
+              "hashtags": ["hashtag1", "hashtag2"],
+              "cta": "call to action"
+            },
+            "tuesday": { ... },
+            "wednesday": { ... },
+            "thursday": { ... },
+            "friday": { ... }
+          }
+        }`;
+
+        const result = await generateText({
+          model: google('gemini-2.0-flash-exp'),
+          prompt,
+          temperature: 0.7,
+          maxTokens: 2000,
+        });
+
+        let calendar;
+        try {
+          const jsonMatch = result.text.match(/```json\n?([\s\S]*?)\n?```/);
+          const jsonText = jsonMatch ? jsonMatch[1] : result.text;
+          calendar = JSON.parse(jsonText);
+        } catch (parseError) {
+          calendar = {
+            week: startDate,
+            theme: theme,
+            calendar: result.text
+          };
         }
-        result = await agent.generateBatchContent(params.topics);
-        break;
+
+        return new Response(JSON.stringify({ 
+          success: true, 
+          data: calendar,
+          timestamp: new Date().toISOString()
+        }), {
+          status: 200,
+          headers: { ...headers, 'Content-Type': 'application/json' },
+        });
+      }
+      
+      case 'batch': {
+        if (!params.topics || !Array.isArray(params.topics)) {
+          return new Response(JSON.stringify({ error: 'Topics array is required for batch generation' }), {
+            status: 400,
+            headers: { ...headers, 'Content-Type': 'application/json' },
+          });
+        }
+
+        const results = [];
+        
+        for (const topic of params.topics) {
+          const prompt = `Create a short, engaging LinkedIn post about: ${topic}
+          For wealth management professionals and firms.
+          Include relevant hashtags and a call to action.
+          Keep it concise and professional.`;
+          
+          const result = await generateText({
+            model: google('gemini-2.0-flash-exp'),
+            prompt,
+            temperature: 0.7,
+            maxTokens: 500,
+          });
+          
+          results.push({
+            topic,
+            content: result.text,
+            generated: new Date().toISOString()
+          });
+        }
+
+        return new Response(JSON.stringify({ 
+          success: true, 
+          data: results,
+          timestamp: new Date().toISOString()
+        }), {
+          status: 200,
+          headers: { ...headers, 'Content-Type': 'application/json' },
+        });
+      }
+      
+      case 'stream': {
+        const topic = params.topic || 'wealth management trends';
+        const prompt = `Generate a comprehensive weekly content plan for: ${topic}
+        Include diverse content types, engagement strategies, and measurement metrics.`;
+
+        const result = await streamText({
+          model: google('gemini-2.0-flash-exp'),
+          prompt,
+          temperature: 0.7,
+          maxTokens: 3000,
+        });
+
+        return new Response(result.toDataStreamResponse().body, {
+          headers: {
+            ...headers,
+            'Content-Type': 'text/event-stream',
+            'Cache-Control': 'no-cache',
+            'Connection': 'keep-alive',
+          },
+        });
+      }
+      
       default:
-        return res.status(400).json({ error: `Unknown action: ${action}` });
+        return new Response(JSON.stringify({ error: `Unknown action: ${action}` }), {
+          status: 400,
+          headers: { ...headers, 'Content-Type': 'application/json' },
+        });
     }
     
-    res.status(200).json({ 
-      success: true, 
-      data: result,
-      timestamp: new Date().toISOString()
-    });
   } catch (error) {
     console.error('Weekly content generation error:', error);
-    res.status(500).json({ error: error.message });
+    return new Response(JSON.stringify({ error: error.message }), {
+      status: 500,
+      headers: { ...headers, 'Content-Type': 'application/json' },
+    });
   }
-};
+}
