@@ -3,26 +3,8 @@
   "buildCommand": "cd frontend && npm install && npm run build",
   "outputDirectory": "frontend/build",
   "framework": "create-react-app",
-  "functions": {
-    "api/**/*.js": {
-      "maxDuration": 30
-    }
-  },
   "rewrites": [
-    {
-      "source": "/api/(.*)",
-      "destination": "/api/$1"
-    },
-    {
-      "source": "/(.*)",
-      "destination": "/index.html"
-    }
-  ],
-  "env": {
-    "NODE_ENV": "production",
-    "REACT_APP_API_URL": "https://studio.thewell.solutions",
-    "REACT_APP_SUPABASE_URL": "https://rqtpemdvwuzswnpvnljm.supabase.co",
-    "REACT_APP_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJxdHBlbWR2d3V6c3ducHZubGptIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTYyNzk2NTYsImV4cCI6MjA3MTg1NTY1Nn0.brl3OXHpd5NeoBynsBcY5DntFZGbGgZ0GQDw8FR5kg8"
-  },
-  "regions": ["iad1"]
+    { "source": "/api/(.*)", "destination": "/api/$1" },
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
 }
