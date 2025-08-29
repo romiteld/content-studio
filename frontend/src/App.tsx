@@ -4,6 +4,8 @@ import { AuthProvider } from './contexts/AuthContext';
 import AuthGuard from './components/auth/AuthGuard';
 import { apiFetch } from './config/api';
 import { Routes, Route, useNavigate, useLocation, Navigate } from 'react-router-dom';
+import { KeyboardNavigationProvider } from './contexts/KeyboardNavigationContext';
+import CommandPalette from './components/CommandPalette';
 import './styles/brand.locked.css';
 import './styles/components.css';
 import './styles/quality-enhanced.css';
@@ -14,6 +16,7 @@ import './styles/settings.css';
 import './styles/mobile-responsive.css';
 import './App.css';
 import BrandHeader from './components/locked/BrandHeader';
+import CollapsibleSidebar from './components/navigation/CollapsibleSidebar';
 import ContentEditor from './components/ContentEditor';
 import DocumentPreview from './components/DocumentPreview';
 import UploadManager from './components/UploadManager';
@@ -34,7 +37,6 @@ interface ContentItem {
 }
 
 function AppContent() {
-  const [activeTab, setActiveTab] = useState<'editor' | 'upload' | 'generate' | 'research' | 'social' | 'marketing' | 'settings'>('editor');
   const [contentItems, setContentItems] = useState<ContentItem[]>([]);
   const [selectedContent, setSelectedContent] = useState<ContentItem | null>(null);
   const [previewMode, setPreviewMode] = useState(false);
@@ -75,43 +77,14 @@ function AppContent() {
     }
   }, []);
 
-  const navigate = useNavigate();
   const location = useLocation();
 
   // Initialize from URL on mount
   useEffect(() => {
-    const pathTab = location.pathname.replace('/', '') as any;
-    if (['editor', 'upload', 'generate', 'research', 'social', 'marketing', 'settings'].includes(pathTab)) {
-      setActiveTab(pathTab);
-    } else {
-      const savedTab = (localStorage.getItem('activeTab') as any) || 'editor';
-      setActiveTab(savedTab);
-      navigate(`/${savedTab}`, { replace: true });
-    }
-    
     const savedPreview = localStorage.getItem('previewMode');
     if (savedPreview) setPreviewMode(savedPreview === 'true');
     fetchContent();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
-  // Handle activeTab changes
-  useEffect(() => {
-    localStorage.setItem('activeTab', activeTab);
-    const currentPath = location.pathname.replace('/', '');
-    if (currentPath !== activeTab) {
-      navigate(`/${activeTab}`, { replace: true });
-    }
-  }, [activeTab, navigate]);
-
-  // Sync with browser navigation (back/forward)
-  useEffect(() => {
-    const pathTab = location.pathname.replace('/', '') as any;
-    if (['editor', 'upload', 'generate', 'research', 'social', 'marketing', 'settings'].includes(pathTab)) {
-      if (pathTab !== activeTab) {
-        setActiveTab(pathTab);
-      }
-    }
-  }, [location.pathname]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     localStorage.setItem('previewMode', String(previewMode));
@@ -173,67 +146,21 @@ function AppContent() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
+  const handlePreviewToggle = () => setPreviewMode(!previewMode);
+
   return (
-    <div className="app brand-locked-scope hardware-accelerated">
+    <div className={`app brand-locked-scope hardware-accelerated ${localStorage.getItem('sidebarCollapsed') === 'true' ? 'sidebar-collapsed' : ''}`}>
+      <CollapsibleSidebar 
+        previewMode={previewMode}
+        onPreviewToggle={handlePreviewToggle}
+      />
+      
       <header className="app-header">
         <BrandHeader 
           title="Content Studio"
           subtitle="Research • Create • Generate • Optimize"
         />
       </header>
-
-      <nav className="app-nav">
-        <div className="app-nav-inner">
-          <button 
-            className={`nav-tab will-change-transform ${activeTab === 'editor' ? 'active' : ''}`}
-            onClick={() => setActiveTab('editor')}
-          >
-            Content Editor
-          </button>
-          <button 
-            className={`nav-tab will-change-transform ${activeTab === 'upload' ? 'active' : ''}`}
-            onClick={() => setActiveTab('upload')}
-          >
-            Upload Materials
-          </button>
-          <button 
-            className={`nav-tab will-change-transform ${activeTab === 'generate' ? 'active' : ''}`}
-            onClick={() => setActiveTab('generate')}
-          >
-            Generate Documents
-          </button>
-          <button 
-            className={`nav-tab will-change-transform ${activeTab === 'research' ? 'active' : ''}`}
-            onClick={() => setActiveTab('research')}
-          >
-            Research
-          </button>
-          <button 
-            className={`nav-tab will-change-transform ${activeTab === 'social' ? 'active' : ''}`}
-            onClick={() => setActiveTab('social')}
-          >
-            Social Media
-          </button>
-          <button 
-            className={`nav-tab will-change-transform ${activeTab === 'marketing' ? 'active' : ''}`}
-            onClick={() => setActiveTab('marketing')}
-          >
-            AI Marketing Hub
-          </button>
-          <button 
-            className={`nav-tab will-change-transform ${activeTab === 'settings' ? 'active' : ''}`}
-            onClick={() => setActiveTab('settings')}
-          >
-            Settings
-          </button>
-          <button 
-            className={`nav-tab preview-toggle will-change-transform ${previewMode ? 'active' : ''}`}
-            onClick={() => setPreviewMode(!previewMode)}
-          >
-            {previewMode ? 'Hide Preview' : 'Show Preview'}
-          </button>
-        </div>
-      </nav>
 
       <main className="app-main">
         <div className="content-area">
@@ -274,6 +201,9 @@ function AppContent() {
 
       {/* AI Chat Assistant - Available on all pages */}
       <AIChatAssistant />
+      
+      {/* Command Palette */}
+      <CommandPalette />
     </div>
   );
 }
@@ -282,9 +212,11 @@ function App() {
   return (
     <AuthProvider>
       <ToastProvider>
-        <AuthGuard>
-          <AppContent />
-        </AuthGuard>
+        <KeyboardNavigationProvider>
+          <AuthGuard>
+            <AppContent />
+          </AuthGuard>
+        </KeyboardNavigationProvider>
       </ToastProvider>
     </AuthProvider>
   );

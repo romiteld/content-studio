@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useToast } from './ui/Toast';
 import { useConfirm } from './ui/Confirm';
+import { ListSkeleton } from './ui/SkeletonLoader';
 
 interface ContentEditorProps {
   contentItems: any[];
@@ -98,11 +99,7 @@ const ContentEditor: React.FC<ContentEditorProps> = ({
         <button className="btn-refresh" onClick={onRefresh}>Refresh</button>
         <div className="content-list" aria-busy={isLoading} aria-live="polite">
           {isLoading && (
-            <>
-              <div className="content-item skeleton" />
-              <div className="content-item skeleton" />
-              <div className="content-item skeleton" />
-            </>
+            <ListSkeleton items={3} showActions={false} />
           )}
           {!isLoading && contentItems.length === 0 && (
             <div className="content-item empty-state">No content yet. Create your first section →</div>
