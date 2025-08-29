@@ -1,41 +1,8 @@
 /* Mobile Responsive Improvements */
 
-/* Main App Navigation - Mobile Optimizations */
+/* Main App Navigation - Now handled by CollapsibleSidebar component */
 @media (max-width: 768px) {
-  .app-nav {
-    padding: 0.5rem;
-    overflow-x: auto;
-    overflow-y: hidden;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: thin;
-    scrollbar-color: rgba(212, 175, 55, 0.3) transparent;
-  }
-
-  .app-nav::-webkit-scrollbar {
-    height: 4px;
-  }
-
-  .app-nav::-webkit-scrollbar-track {
-    background: transparent;
-  }
-
-  .app-nav::-webkit-scrollbar-thumb {
-    background: rgba(212, 175, 55, 0.3);
-    border-radius: 2px;
-  }
-
-  .app-nav-inner {
-    display: flex;
-    gap: 0.5rem;
-    min-width: max-content;
-  }
-
-  .nav-tab {
-    flex-shrink: 0;
-    padding: 0.6rem 1rem;
-    font-size: 0.85rem;
-    white-space: nowrap;
-  }
+  /* Old horizontal navigation removed - using CollapsibleSidebar */
 }
 
 @media (max-width: 480px) {
@@ -52,33 +19,7 @@
     display: none; /* Hide subtitle on very small screens */
   }
 
-  .app-nav {
-    padding: 0.5rem;
-    margin: 0 -0.5rem; /* Extend to screen edges */
-  }
-
-  .app-nav-inner {
-    padding: 0 0.5rem;
-  }
-
-  .nav-tab {
-    padding: 0.5rem 0.75rem;
-    font-size: 0.8rem;
-    min-width: auto;
-  }
-
-  /* Shorter button labels on mobile */
-  .nav-tab[data-mobile-label]::after {
-    content: attr(data-mobile-label);
-  }
-
-  .nav-tab[data-mobile-label] {
-    font-size: 0;
-  }
-
-  .nav-tab[data-mobile-label]::after {
-    font-size: 0.8rem;
-  }
+  /* Old navigation styles removed - using CollapsibleSidebar */
 }
 
 /* Marketing Dashboard - Additional Mobile Fixes */
@@ -114,8 +55,7 @@
   }
 
   /* Better touch targets for mobile */
-  .nav-button,
-  .nav-tab {
+  .nav-button {
     min-height: 44px; /* iOS touch target minimum */
     display: flex;
     align-items: center;
@@ -137,12 +77,10 @@
     display: none;
   }
 
-  .app-nav,
   .dashboard-nav {
     padding: 0.25rem 0.5rem;
   }
 
-  .nav-tab,
   .nav-button {
     padding: 0.4rem 0.75rem;
     font-size: 0.75rem;
@@ -241,19 +179,19 @@
   }
 
   /* Disable hover effects on touch devices */
-  .nav-button:hover::after,
-  .nav-tab:hover::after {
+  .nav-button:hover::after {
     display: none;
   }
 }
 
 /* Print styles */
 @media print {
-  .app-nav,
+  .collapsible-sidebar,
   .dashboard-nav,
   .sidebar,
   .floating-button,
-  .ai-assistant {
+  .ai-assistant,
+  .command-palette {
     display: none !important;
   }
 

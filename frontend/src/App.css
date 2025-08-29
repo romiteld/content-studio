@@ -83,103 +83,8 @@
   }
 }
 
-/* Modern Navigation */
-.app-nav {
-  display: flex;
-  justify-content: center;
-  gap: 0.25rem;
-  padding: 0.75rem 2rem;
-  background: rgba(15, 15, 15, 0.95);
-  backdrop-filter: blur(10px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-  align-items: center;
-  position: sticky;
-  top: 0;
-  z-index: 9;
-}
-
-@media (max-width: 768px) {
-  .app-nav {
-    padding: 0.5rem 0.75rem;
-  }
-}
-
-@media (max-width: 480px) {
-  .app-nav {
-    padding: 0.5rem 0.5rem;
-  }
-}
-
-.app-nav-inner {
-  max-width: 1200px;
-  margin: 0 auto;
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  gap: 0.25rem;
-  flex-wrap: wrap;
-  align-items: center;
-}
-
-.nav-tab {
-  padding: 0.75rem 1.5rem;
-  background: transparent;
-  color: rgba(255, 255, 255, 0.7);
-  border: none;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  font-weight: 500;
-  font-size: 0.95rem;
-  letter-spacing: 0.3px;
-  position: relative;
-  overflow: hidden;
-}
-
-.nav-tab::before {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 0;
-  height: 0;
-  background: radial-gradient(circle, rgba(190, 158, 68, 0.3) 0%, transparent 70%);
-  transform: translate(-50%, -50%);
-  transition: width 0.6s ease, height 0.6s ease;
-}
-
-.nav-tab:hover::before {
-  width: 100%;
-  height: 100%;
-}
-
-.nav-tab:hover {
-  color: #D4AF37;
-  background: rgba(190, 158, 68, 0.08);
-  transform: translateY(-1px);
-}
-
-.nav-tab.active {
-  color: #D4AF37;
-  background: linear-gradient(135deg, rgba(190, 158, 68, 0.15), rgba(212, 175, 55, 0.08));
-  box-shadow: 0 2px 8px rgba(190, 158, 68, 0.2);
-}
-
-.preview-toggle {
-  position: absolute;
-  right: 2rem;
-  background: rgba(46, 163, 242, 0.1);
-  color: #4FC3F7;
-}
-
-.preview-toggle:hover {
-  background: rgba(46, 163, 242, 0.2);
-}
-
-.preview-toggle.active {
-  background: rgba(46, 163, 242, 0.25);
-  box-shadow: 0 2px 8px rgba(46, 163, 242, 0.3);
-}
+/* Navigation area now handled by CollapsibleSidebar component */
+/* Old horizontal navigation removed - using vertical sidebar instead */
 
 /* Global Layout System - Centers All Content */
 .app-main {
@@ -1795,39 +1700,15 @@ body {
 }
 
 @media (max-width: 1400px) {
-  .nav-tab {
-    padding: 0.7rem 1.25rem;
-    font-size: 0.92rem;
-  }
+  /* Old navigation styles removed - using CollapsibleSidebar */
 }
 
 @media (max-width: 1200px) {
-  .preview-toggle {
-    position: relative;
-    right: auto;
-  }
-  
-  .nav-tab {
-    padding: 0.65rem 1rem;
-    font-size: 0.9rem;
-    flex-shrink: 0;
-  }
-  
-  .app-nav {
-    padding: 0.75rem 1rem;
-  }
+  /* Old navigation styles removed - using CollapsibleSidebar */
 }
 
 @media (max-width: 1024px) {
-  .app-nav-inner {
-    justify-content: flex-start;
-    gap: 0.2rem;
-  }
-  
-  .nav-tab {
-    padding: 0.6rem 0.9rem;
-    font-size: 0.88rem;
-  }
+  /* Old navigation styles removed - using CollapsibleSidebar */
 }
 
 @media (max-width: 960px) {
@@ -1849,61 +1730,15 @@ body {
     max-height: 300px;
   }
   
-  .app-nav {
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    padding: 0.5rem;
-  }
-  
-  .app-nav-inner {
-    width: auto;
-    min-width: min-content;
-    flex-wrap: nowrap;
-  }
-  
-  .nav-tab {
-    padding: 0.55rem 0.85rem;
-    font-size: 0.85rem;
-    white-space: nowrap;
-    flex-shrink: 0;
-  }
-  
-  .app-nav::-webkit-scrollbar {
-    height: 4px;
-  }
-  
-  .app-nav::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.02);
-  }
-  
-  .app-nav::-webkit-scrollbar-thumb {
-    background: rgba(190, 158, 68, 0.3);
-    border-radius: 2px;
-  }
+  /* Old horizontal navigation styles removed - using CollapsibleSidebar */
 }
 
 @media (max-width: 768px) {
-  .nav-tab {
-    padding: 0.5rem 0.75rem;
-    font-size: 0.82rem;
-    letter-spacing: 0;
-  }
-  
-  .app-nav {
-    padding: 0.4rem;
-  }
+  /* Old navigation styles removed - using CollapsibleSidebar */
 }
 
 @media (max-width: 640px) {
-  .nav-tab {
-    padding: 0.45rem 0.65rem;
-    font-size: 0.8rem;
-    border-radius: 8px;
-  }
-  
-  .app-nav-inner {
-    gap: 0.15rem;
-  }
+  /* Navigation now handled by CollapsibleSidebar - removed old styles */
 }
 
 /* Search Bar */

@@ -55,7 +55,7 @@ export default function ProgressiveForm({
   });
 
   useEffect(() => {
-    localStorage.setItem(`form_expanded_${storageKey}`, JSON.stringify(Array.from(expandedSections)));
+    localStorage.setItem(`form_expanded_${storageKey}`, JSON.stringify([...Array.from(expandedSections)]));
   }, [expandedSections, storageKey]);
 
   useEffect(() => {
@@ -79,7 +79,7 @@ export default function ProgressiveForm({
     if (!showAdvanced) {
       // Expand all advanced sections when showing
       const advancedIds = sections.filter(s => s.isAdvanced).map(s => s.id);
-      setExpandedSections(prev => new Set([...prev, ...advancedIds]));
+      setExpandedSections(prev => new Set([...Array.from(prev), ...advancedIds]));
     }
   };
 

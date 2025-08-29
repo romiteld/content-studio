@@ -255,17 +255,9 @@ button:active,
   min-width: 120px; /* 15 * 8px */
 }
 
-/* Navigation Tabs */
-.app-nav {
-  padding: 0 var(--space-lg);
-  height: 56px; /* 7 * 8px */
-}
-
-.nav-tab {
-  padding: var(--space-md) var(--space-lg);
-  margin: 0 var(--space-xs);
-  border-radius: var(--radius-md) var(--radius-md) 0 0;
-}
+/* Navigation Tabs - Now handled by CollapsibleSidebar component */
+/* Old .app-nav styles removed */
+/* Old .nav-tab styles removed - using CollapsibleSidebar component */
 
 /* Footer */
 .app-footer {

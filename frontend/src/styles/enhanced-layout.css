@@ -91,58 +91,10 @@
 }
 
 /* ========================================
-   ENHANCED NAVIGATION
+   ENHANCED NAVIGATION - Now handled by CollapsibleSidebar
    ======================================== */
 
-.app-nav {
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  backdrop-filter: blur(20px) saturate(180%);
-  background: linear-gradient(
-    90deg,
-    rgba(15, 15, 15, 0.95),
-    rgba(20, 20, 20, 0.95)
-  );
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-}
-
-.nav-tab {
-  position: relative;
-  isolation: isolate;
-}
-
-.nav-tab::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: 12px;
-  padding: 1px;
-  background: linear-gradient(
-    45deg,
-    transparent,
-    rgba(212, 175, 55, 0.3),
-    transparent
-  );
-  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  mask-composite: exclude;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.nav-tab:hover::after {
-  opacity: 1;
-}
-
-.nav-tab.active {
-  animation: glow 2s ease-in-out infinite;
-  background: linear-gradient(
-    135deg,
-    rgba(190, 158, 68, 0.2),
-    rgba(212, 175, 55, 0.1)
-  );
-  border: 1px solid rgba(212, 175, 55, 0.3);
-}
+/* Old .app-nav and .nav-tab styles removed - using CollapsibleSidebar component */
 
 /* ========================================
    CARD ENHANCEMENTS

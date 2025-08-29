@@ -3,7 +3,7 @@ import { ToastProvider, useToast } from './components/ui/Toast';
 import { AuthProvider } from './contexts/AuthContext';
 import AuthGuard from './components/auth/AuthGuard';
 import { apiFetch } from './config/api';
-import { Routes, Route, useNavigate, useLocation, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { KeyboardNavigationProvider } from './contexts/KeyboardNavigationContext';
 import CommandPalette from './components/CommandPalette';
 import './styles/brand.locked.css';
