@@ -2,9 +2,10 @@ const { createClient } = require('@supabase/supabase-js');
 const path = require('path');
 const fs = require('fs');
 
-// Load environment variables
-if (fs.existsSync(path.join(__dirname, '.env.local'))) {
-  require('dotenv').config({ path: path.join(__dirname, '.env.local') });
+// Load environment variables from backend directory
+const envPath = path.join(__dirname, '..', '..', '.env.local');
+if (fs.existsSync(envPath)) {
+  require('dotenv').config({ path: envPath });
 } else {
   require('dotenv').config();
 }

@@ -40,7 +40,7 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 app.use(express.json());
-app.use(express.static(path.join(__dirname, 'frontend/build')));
+app.use(express.static(path.join(__dirname, '../frontend/build')));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.use('/brand-assets', express.static(path.join(__dirname, 'brand-assets/protected')));
 
@@ -85,8 +85,11 @@ const { authenticateToken } = require('./src/middleware/supabase-auth');
 
 // Apply authentication middleware to all API routes except /api/auth
 app.use('/api/*', (req, res, next) => {
-  // Skip auth check for auth routes and health check
-  if (req.baseUrl.startsWith('/api/auth') || req.baseUrl === '/api/health') {
+  // Skip auth check for auth routes, health check, and brand config
+  const fullPath = req.originalUrl || (req.baseUrl + req.path);
+  if (fullPath.startsWith('/api/auth') || 
+      fullPath === '/api/health' || 
+      fullPath === '/api/brand-config') {
     return next();
   }
   // Apply authentication for all other API routes
@@ -118,7 +121,7 @@ app.post('/api/agents/validate', aiAgents.validateCompliance);
 app.use('/api/partners', require('./src/api/partners-supabase'));
 
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'frontend/build', 'index.html'));
+  res.sendFile(path.join(__dirname, '../frontend/build', 'index.html'));
 });
 
 app.listen(PORT, () => {

@@ -28,7 +28,7 @@ const platformGuidelines = {
   },
   facebook: {
     postLimit: 63206,
-    optimalLength: 40-80, // Characters for highest engagement
+    optimalLength: '40-80', // Characters for highest engagement
     videoDescLimit: 125,
     hashtagLimit: 2,
     bestPractices: [
