@@ -45,6 +45,14 @@ function AppContent() {
     try {
       setIsLoading(true);
       const data = await apiFetch<any[]>({ path: '/api/content', method: 'GET' });
+      
+      // Check if data is an array
+      if (!Array.isArray(data)) {
+        console.warn('Content API returned non-array data:', data);
+        setContentItems([]);
+        return;
+      }
+      
       setContentItems(data.map((item: any) => ({
         ...item,
         content_data: typeof item.content_data === 'string' 
@@ -57,13 +65,15 @@ function AppContent() {
             })()
           : item.content_data || {} // Already an object or null/undefined
       })));
-    } catch (error) {
-      console.error('Failed to fetch content:', error);
-      showToast('Failed to fetch content', 'error');
+    } catch (error: any) {
+      console.warn('Failed to fetch content:', error?.message || error);
+      // Don't show error toast for initial load failures
+      // This prevents annoying the user when the backend is not running
+      setContentItems([]);
     } finally {
       setIsLoading(false);
     }
-  }, [showToast]);
+  }, []);
 
   const navigate = useNavigate();
   const location = useLocation();

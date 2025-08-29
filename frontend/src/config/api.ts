@@ -51,7 +51,12 @@ export async function apiFetch<T = any>({ path, headers, ...init }: ApiRequestOp
   if (init.integrity) fetchOptions.integrity = init.integrity;
 
   try {
-    const response = await fetch(url, fetchOptions);
+    const response = await fetch(url, fetchOptions).catch((err) => {
+      if (err.name === 'AbortError') {
+        throw new Error('Request timeout - server may be unavailable');
+      }
+      throw new Error(`Network error: ${err.message}`);
+    });
 
     const isJson = (response.headers.get('content-type') || '').includes('application/json');
     const body = isJson ? await response.json() : await response.text();

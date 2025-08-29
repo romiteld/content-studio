@@ -44,7 +44,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const fetchProfile = async (userId: string) => {
     if (!supabase) {
-      console.error('Supabase client not initialized');
+      console.warn('Supabase client not initialized, skipping profile fetch');
       return null;
     }
     
@@ -56,13 +56,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         .single();
 
       if (error) {
-        console.error('Error fetching profile:', error);
+        if (error.code === 'PGRST116') {
+          console.warn('Profile not found for user:', userId);
+        } else {
+          console.warn('Error fetching profile:', error.message);
+        }
         return null;
       }
 
       return data as UserProfile;
     } catch (error) {
-      console.error('Error fetching profile:', error);
+      console.warn('Error fetching profile:', error);
       return null;
     }
   };

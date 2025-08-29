@@ -8,64 +8,38 @@ const supabase = createClient(
 
 module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, PUT, DELETE, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   
   if (req.method === 'OPTIONS') return res.status(200).end();
   
+  const { id } = req.query;
+  
+  if (!id) {
+    return res.status(400).json({ error: 'Content ID is required' });
+  }
+  
   if (req.method === 'GET') {
     try {
-      // Fetch content from Supabase
       const { data, error } = await supabase
         .from('content')
         .select('*')
-        .order('display_order', { ascending: true });
-      
-      if (error) {
-        console.error('Error fetching content:', error);
-        return res.status(500).json({ error: 'Failed to fetch content' });
-      }
-      
-      return res.status(200).json(data || []);
-    } catch (error) {
-      console.error('Error in content API:', error);
-      return res.status(500).json({ error: 'Internal server error' });
-    }
-  }
-  
-  if (req.method === 'POST') {
-    try {
-      const { section_type, title, content_data, chart_data, display_order } = req.body;
-      
-      const { data, error } = await supabase
-        .from('content')
-        .insert({
-          section_type,
-          title,
-          content_data,
-          chart_data,
-          display_order: display_order || 0
-        })
-        .select()
+        .eq('id', id)
         .single();
       
       if (error) {
-        console.error('Error creating content:', error);
-        return res.status(500).json({ error: 'Failed to create content' });
+        console.error('Error fetching content:', error);
+        return res.status(404).json({ error: 'Content not found' });
       }
       
-      return res.status(200).json({ 
-        success: true, 
-        data,
-        message: 'Content created successfully' 
-      });
+      return res.status(200).json(data);
     } catch (error) {
       console.error('Error in content API:', error);
       return res.status(500).json({ error: 'Internal server error' });
     }
   }
   
-  if (req.method === 'PUT' && req.query.id) {
+  if (req.method === 'PUT') {
     try {
       const { section_type, title, content_data, chart_data, display_order } = req.body;
       
@@ -79,7 +53,7 @@ module.exports = async (req, res) => {
           display_order,
           updated_at: new Date().toISOString()
         })
-        .eq('id', req.query.id)
+        .eq('id', id)
         .select()
         .single();
       
@@ -99,12 +73,12 @@ module.exports = async (req, res) => {
     }
   }
   
-  if (req.method === 'DELETE' && req.query.id) {
+  if (req.method === 'DELETE') {
     try {
       const { error } = await supabase
         .from('content')
         .delete()
-        .eq('id', req.query.id);
+        .eq('id', id);
       
       if (error) {
         console.error('Error deleting content:', error);

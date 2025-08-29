@@ -51,7 +51,25 @@ export default function TemplateGallery() {
   const fetchTemplates = async () => {
     try {
       const response = await fetch('/api/templates');
+      
+      if (!response.ok) {
+        console.warn('Templates API returned error:', response.status);
+        setTemplates([]);
+        return;
+      }
+      
       const data = await response.json();
+      
+      // Check if data is an array, otherwise handle the error
+      if (!Array.isArray(data)) {
+        console.warn('Templates API returned non-array data:', data);
+        if (data?.error) {
+          console.warn('Template fetch error:', data.error);
+        }
+        setTemplates([]);
+        return;
+      }
+      
       // Transform data for frontend display
       const transformedTemplates: Template[] = data.map((t: any) => ({
         id: t.id,
@@ -68,7 +86,8 @@ export default function TemplateGallery() {
       }));
       setTemplates(transformedTemplates);
     } catch (error) {
-      console.error('Failed to fetch templates:', error);
+      console.warn('Failed to fetch templates:', error);
+      setTemplates([]);
     }
   };
 

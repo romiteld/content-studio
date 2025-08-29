@@ -1,5 +1,5 @@
 {
-  "timestamp": "2025-08-27T20:44:23.281Z",
+  "timestamp": "2025-08-29T15:32:16.326Z",
   "url": "https://studio.thewell.solutions",
   "summary": {
     "total": 19,
@@ -12,118 +12,118 @@
       "name": "Frontend Home",
       "path": "/",
       "method": "GET",
-      "duration": 215
+      "duration": 287
     },
     {
       "name": "API Health",
       "path": "/api/health",
       "method": "GET",
-      "duration": 257
+      "duration": 400
     },
     {
       "name": "AI Chat",
       "path": "/api/ai-chat",
       "method": "POST",
-      "duration": 717
+      "duration": 1036
     },
     {
-      "name": "Auth Register",
-      "path": "/api/auth/register",
+      "name": "Auth Login",
+      "path": "/api/auth/login",
       "method": "POST",
-      "duration": 694
+      "duration": 829
     },
     {
       "name": "Auth Logout",
       "path": "/api/auth/logout",
       "method": "POST",
-      "duration": 234
+      "duration": 448
     },
     {
       "name": "Auth Session",
       "path": "/api/auth/session",
       "method": "GET",
-      "duration": 235
+      "duration": 389
     },
     {
       "name": "Get Content",
       "path": "/api/content",
       "method": "GET",
-      "duration": 278
+      "duration": 422
     },
     {
       "name": "Create Content",
       "path": "/api/content",
       "method": "POST",
-      "duration": 250
+      "duration": 397
     },
     {
       "name": "Get Templates",
       "path": "/api/templates",
       "method": "GET",
-      "duration": 286
+      "duration": 293
     },
     {
       "name": "Create Template",
       "path": "/api/templates",
       "method": "POST",
-      "duration": 261
+      "duration": 279
     },
     {
       "name": "AI Image Generation",
       "path": "/api/ai-image",
       "method": "POST",
-      "duration": 277
+      "duration": 2061
     },
     {
       "name": "PDF Generation",
       "path": "/api/generate-pdf",
       "method": "POST",
-      "duration": 252
+      "duration": 7955
     },
     {
       "name": "Marketing Analysis",
       "path": "/api/ai-marketing/analyze",
       "method": "POST",
-      "duration": 239
+      "duration": 5664
     },
     {
       "name": "Get Brand Settings",
       "path": "/api/brand",
       "method": "GET",
-      "duration": 236
+      "duration": 438
     },
     {
       "name": "Update Brand",
       "path": "/api/brand",
       "method": "POST",
-      "duration": 214
+      "duration": 425
     },
     {
       "name": "Research Search",
       "path": "/api/research/search",
       "method": "POST",
-      "duration": 244
+      "duration": 9206
     },
     {
       "name": "Social Optimize",
       "path": "/api/social/optimize",
       "method": "POST",
-      "duration": 236
+      "duration": 380
     },
     {
       "name": "Vision Analysis",
       "path": "/api/vision/analyze",
       "method": "POST",
-      "duration": 228
+      "duration": 1250
     }
   ],
   "broken_endpoints": [
     {
-      "name": "Auth Login",
-      "path": "/api/auth/login",
+      "name": "Auth Register",
+      "path": "/api/auth/register",
       "method": "POST",
-      "status": 401,
-      "error": "{\"error\":\"Invalid login credentials\"}"
+      "status": 400,
+      "error": "{\"error\":\"A user with this email address has already been registered\"}"
     }
   ]
 }

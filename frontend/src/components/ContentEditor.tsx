@@ -59,6 +59,19 @@ const ContentEditor: React.FC<ContentEditorProps> = ({
     }
   }, [selectedContent]);
 
+  // Handle save keyboard shortcut
+  useEffect(() => {
+    const handleSaveShortcut = () => {
+      const form = document.querySelector('.editor-form form') as HTMLFormElement;
+      if (form) {
+        form.requestSubmit();
+      }
+    };
+    
+    window.addEventListener('app:save', handleSaveShortcut);
+    return () => window.removeEventListener('app:save', handleSaveShortcut);
+  }, []);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const newErrors: Record<string, string> = {};
@@ -258,8 +271,8 @@ const ContentEditor: React.FC<ContentEditorProps> = ({
           </div>
 
           <div className="form-actions">
-            <button type="submit" className="btn-save" disabled={isSaving}>
-              {selectedContent ? 'Update' : 'Create'} Content
+            <button type="submit" className="btn-save" disabled={isSaving} title="Ctrl+S / Cmd+S to save">
+              {isSaving ? 'Saving...' : selectedContent ? 'Update' : 'Create'} Content
             </button>
             {selectedContent && (
               <>
