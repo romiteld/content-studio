@@ -16,6 +16,7 @@ const SignIn: React.FC<SignInProps> = ({ onSuccess }) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [animationKey] = useState(() => Date.now()); // Stable key for animation
 
   const { signInWithOTP, verifyOTP } = useAuth();
 
@@ -96,6 +97,7 @@ const SignIn: React.FC<SignInProps> = ({ onSuccess }) => {
     <div className="auth-container">
       {/* Animated background with brand colors */}
       <SplashCursor 
+        key={animationKey} // Prevent re-initialization
         BACK_COLOR={{ r: 0.0, g: 0.0, b: 0.0 }}
         TRANSPARENT={true}
         COLOR_UPDATE_SPEED={8}
@@ -152,6 +154,10 @@ const SignIn: React.FC<SignInProps> = ({ onSuccess }) => {
                   className="form-input with-icon"
                   disabled={loading}
                   required
+                  autoComplete="email"
+                  autoCorrect="off"
+                  autoCapitalize="off"
+                  spellCheck="false"
                 />
               </div>
               <p className="form-hint">
@@ -193,6 +199,11 @@ const SignIn: React.FC<SignInProps> = ({ onSuccess }) => {
                 maxLength={6}
                 disabled={loading}
                 required
+                autoComplete="one-time-code"
+                autoCorrect="off"
+                autoCapitalize="off"
+                spellCheck="false"
+                inputMode="numeric"
               />
               <p className="form-hint">
                 Enter the 6-digit code sent to <strong>{email}</strong>

@@ -306,26 +306,35 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
       // Listen for auth changes
       const authListener = supabase.auth.onAuthStateChange(async (event: any, session: any) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      
-      if (session?.user) {
-        // Store access token when session changes
-        if (session.access_token) {
-          localStorage.setItem('authToken', session.access_token);
-          sessionStorage.setItem('authToken', session.access_token);
-        }
-        
-        const userProfile = await fetchProfile(session.user.id);
-        setProfile(userProfile);
-      } else {
-        // Clear tokens on logout
-        localStorage.removeItem('authToken');
-        sessionStorage.removeItem('authToken');
-        setProfile(null);
+      // Only update state if there's an actual change in authentication status
+      // Ignore INITIAL_SESSION event if we already have a session
+      if (event === 'INITIAL_SESSION' && user) {
+        return;
       }
       
-      setLoading(false);
+      // Only update if session actually changed
+      if (session?.user?.id !== user?.id) {
+        setSession(session);
+        setUser(session?.user ?? null);
+        
+        if (session?.user) {
+          // Store access token when session changes
+          if (session.access_token) {
+            localStorage.setItem('authToken', session.access_token);
+            sessionStorage.setItem('authToken', session.access_token);
+          }
+          
+          const userProfile = await fetchProfile(session.user.id);
+          setProfile(userProfile);
+        } else {
+          // Clear tokens on logout
+          localStorage.removeItem('authToken');
+          sessionStorage.removeItem('authToken');
+          setProfile(null);
+        }
+      }
+      
+      // Don't change loading state here - it's already handled in the initial load
     });
 
       return () => authListener.data.subscription.unsubscribe();
